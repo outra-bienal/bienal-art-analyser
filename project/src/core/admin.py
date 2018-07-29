@@ -47,7 +47,7 @@ class AdminFancyPreview(object):
 
 class AnalysedImageInline(admin.TabularInline):
     model = AnalysedImage
-    extra = 1
+    extra = 5
     suit_classes = 'suit-tab suit-tab-images'
     fields = ['image', 'collection']
 
@@ -91,6 +91,8 @@ class CollectionAdmin(admin.ModelAdmin):
 class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
     list_display = ['id', 'preview', 'processed', 'link_to_collection']
     list_filter = ['collection__title']
+    exclude = ['job_id', 'collection', 'image', 'recokgnition_result']
+    readonly_fields = ['link_to_collection', 'preview', 'aws']
 
     def link_to_collection(self, obj):
         link = reverse("admin:core_collection_change", args=[obj.collection.id])
@@ -102,6 +104,19 @@ class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
         return obj.processed
     processed.short_description = _('Já análizado')
     processed.boolean = True
+
+    def aws(self, obj):
+        if not obj.recokgnition_result:
+            return '---'
+        else:
+            html = '<ul>'
+            for label in obj.recokgnition_result:
+                li = '<li>Label: <b>{}</b> ({} de confiança)</li>'
+                html += li.format(label['Name'], str(label['Confidence'])[:5])
+            html += '</ul>'
+            return format_html(html)
+    aws.short_description = _('AWS Recokgition')
+
 
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(AnalysedImage, AnalysedImageAdmin)
