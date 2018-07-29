@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext as _
+from django.contrib import messages
 
 from src.core.models import AnalysedImage, Collection
 
@@ -23,6 +24,7 @@ class CollectionAdmin(admin.ModelAdmin):
     suit_form_tabs = (('colecao', _('Coleção')), ('images', _('Imagens')))
     list_display = ['title', 'date']
     inlines = [AnalysedImageInline]
+    actions = ['run_analysis']
     fieldsets = (
         (None, {
             'fields': ('title', 'date'),
@@ -34,7 +36,12 @@ class CollectionAdmin(admin.ModelAdmin):
         })
     )
 
-
+    def run_analysis(self, request, queryset):
+        for collection in queryset.all():
+            collection.run_analysis()
+        msg = "{} coleções foram enfileiradas para serem analisadas.".format(queryset.count())
+        self.message_user(request, msg, messages.SUCCESS)
+    run_analysis.short_description = _('Roda AI nas imagens da coleção')
 
 
 
