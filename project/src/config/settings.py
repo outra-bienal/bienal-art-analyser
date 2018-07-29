@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'raven.contrib.django.raven_compat',
     'django_extensions',
     'django_rq',
     'storages',
@@ -108,7 +109,7 @@ USE_TZ = True
 
 
 # Django RQ
-REDIS_URL = config('REDISTOGO_URL', default='redis://localhost:50002')
+REDIS_URL = config('REDIS_URL', default='redis://localhost:50002')
 RQ_QUEUES = {
     'default': {
         'URL': REDIS_URL,
