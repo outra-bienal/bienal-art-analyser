@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 from django.conf import settings
 from django.test import TestCase
 
-from .sample_responses import AWS_RESPONSE
+from .sample_responses import AWS_LABELS_RESPONSE
 from src.core.analysers import aws_analyser
 
 
@@ -13,12 +13,12 @@ class TestAWSAnalyser(TestCase):
     @patch('src.core.analysers.boto3')
     def test_return_response_if_success(self, MockedBoto3):
         client = Mock()
-        client.detect_labels.return_value = AWS_RESPONSE
+        client.detect_labels.return_value = AWS_LABELS_RESPONSE
         MockedBoto3.client.return_value = client
 
         data = aws_analyser(self.image_url)
 
-        assert AWS_RESPONSE == data
+        assert AWS_LABELS_RESPONSE == data
         MockedBoto3.client.assert_called_once_with(
             'rekognition',
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
