@@ -1,11 +1,13 @@
 from unipath import Path
 
+import dj_database_url
 from decouple import config
 
 BASE_DIR = Path(__file__).ancestor(3)
 SRC_DIR = BASE_DIR.child('src')
 
 
+TESTING = False
 DEBUG = config('DEBUG', cast=bool)
 SECRET_KEY = config('SECRET_KEY')
 PRODUCTION = config('PRODUCTION', default=False)
@@ -22,7 +24,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'django_rq',
     'storages',
+    'src.core',
 ]
 
 MIDDLEWARE = [
@@ -71,15 +75,13 @@ if PRODUCTION:
     AWS_S3_HOST = config('AWS_S3_HOST')
     AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
     AWS_S3_SIGNATURE_VERSION = 's3v4'
+    S3_USE_SIGV4 = True
 
     S3_URL = '{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
     MEDIA_URL = S3_URL
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR.child('db.sqlite3'),
-    }
+    'default': dj_database_url.parse(config('DATABASE_URL'))
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -103,6 +105,17 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+
+# Django RQ
+REDIS_URL = config('REDISTOGO_URL', default='redis://localhost:50002')
+RQ_QUEUES = {
+    'default': {
+        'URL': REDIS_URL,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 5000,
+    },
+}
 
 
 # Admin config
