@@ -21,6 +21,7 @@ def aws_analyser(image_url):
         return {
             'Labels': client.detect_labels(Image=image)['Labels'],
             'FaceDetails': client.detect_faces(Image=image)['FaceDetails'],
+            'ModerationLabels': client.detect_moderation_labels(Image=image)['ModerationLabels'],
         }
     except Exception as e:
         print(e)
