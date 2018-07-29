@@ -16,6 +16,7 @@ class TestAWSAnalyser(TestCase):
         client.detect_labels.return_value = AWS_LABELS_RESPONSE
         client.detect_faces.return_value = AWS_FACES_RESPONSE
         client.detect_moderation_labels.return_value = AWS_MODERATION_RESPONSE
+        client.recognize_celebrities.return_value = AWS_CELEBRITIES_RESPONSE
         MockedBoto3.client.return_value = client
 
         data = aws_analyser(self.image_url)
@@ -23,6 +24,8 @@ class TestAWSAnalyser(TestCase):
             'Labels': AWS_LABELS_RESPONSE['Labels'],
             'FaceDetails': AWS_FACES_RESPONSE['FaceDetails'],
             'ModerationLabels': AWS_MODERATION_RESPONSE['ModerationLabels'],
+            'CelebrityFaces': AWS_CELEBRITIES_RESPONSE['CelebrityFaces'],
+            'UnrecognizedFaces': AWS_CELEBRITIES_RESPONSE['UnrecognizedFaces'],
         }
 
         assert expected == data
@@ -40,6 +43,7 @@ class TestAWSAnalyser(TestCase):
         client.detect_labels.assert_called_once_with(**kwargs)
         client.detect_faces.assert_called_once_with(**kwargs)
         client.detect_moderation_labels.assert_called_once_with(**kwargs)
+        client.recognize_celebrities.assert_called_once_with(**kwargs)
 
     @patch('src.core.analysers.boto3')
     def test_return_none_if_any_error(self, MockedBoto3):

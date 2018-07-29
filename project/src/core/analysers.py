@@ -18,10 +18,13 @@ def aws_analyser(image_url):
         }
     }
     try:
+        celebrities = client.recognize_celebrities(Image=image)
         return {
             'Labels': client.detect_labels(Image=image)['Labels'],
             'FaceDetails': client.detect_faces(Image=image)['FaceDetails'],
             'ModerationLabels': client.detect_moderation_labels(Image=image)['ModerationLabels'],
+            'CelebrityFaces': celebrities['CelebrityFaces'],
+            'UnrecognizedFaces': celebrities['UnrecognizedFaces'],
         }
     except Exception as e:
         print(e)
