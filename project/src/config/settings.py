@@ -7,6 +7,7 @@ BASE_DIR = Path(__file__).ancestor(3)
 SRC_DIR = BASE_DIR.child('src')
 
 
+TESTING = False
 DEBUG = config('DEBUG', cast=bool)
 SECRET_KEY = config('SECRET_KEY')
 PRODUCTION = config('PRODUCTION', default=False)
@@ -23,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'django_rq',
     'storages',
     'src.core',
 ]
@@ -103,6 +105,17 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+
+# Django RQ
+REDIS_URL = config('REDISTOGO_URL', default='redis://localhost:50002')
+RQ_QUEUES = {
+    'default': {
+        'URL': REDIS_URL,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 5000,
+    },
+}
 
 
 # Admin config
