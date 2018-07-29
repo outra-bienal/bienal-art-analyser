@@ -7,7 +7,7 @@ from src.core.tasks import analyse_image_task
 
 
 class Collection(models.Model):
-    title = models.CharField(max_length=200, verbose_name=_('Título'))
+    title = models.CharField(max_length=200, verbose_name=_('Título da Coleção'))
     date = models.DateField(verbose_name=_('Data'))
 
     def run_analysis(self):

@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext as _
@@ -50,10 +52,9 @@ class AnalysedImageInline(admin.TabularInline):
     fields = ['image', 'collection']
 
 
-
 class CollectionAdmin(admin.ModelAdmin):
     suit_form_tabs = (('colecao', _('Coleção')), ('images', _('Imagens')))
-    list_display = ['title', 'date']
+    list_display = ['title', 'date', 'processed', 'link_to_images']
     inlines = [AnalysedImageInline]
     actions = ['run_analysis']
     fieldsets = (
@@ -67,6 +68,18 @@ class CollectionAdmin(admin.ModelAdmin):
         })
     )
 
+    def processed(self, obj):
+        return all([i.processed for i in obj.analysed_images.all()])
+    processed.short_description = _('Já análizado')
+    processed.boolean = True
+
+    def link_to_images(self, obj):
+        qs = urlencode({'collection__title': obj.title})
+        link = reverse("admin:core_analysedimage_changelist") + '?' + qs
+        tag = '<a href="%s">%s</a>' % (link, _("Listar imagens"))
+        return format_html(tag)
+    link_to_images.short_description = _('Imagens')
+
     def run_analysis(self, request, queryset):
         for collection in queryset.all():
             collection.run_analysis()
@@ -77,6 +90,7 @@ class CollectionAdmin(admin.ModelAdmin):
 
 class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
     list_display = ['id', 'preview', 'processed', 'link_to_collection']
+    list_filter = ['collection__title']
 
     def link_to_collection(self, obj):
         link = reverse("admin:core_collection_change", args=[obj.collection.id])
@@ -84,6 +98,10 @@ class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
         return format_html(tag)
     link_to_collection.short_description = _('Coleção')
 
+    def processed(self, obj):
+        return obj.processed
+    processed.short_description = _('Já análizado')
+    processed.boolean = True
 
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(AnalysedImage, AnalysedImageAdmin)
