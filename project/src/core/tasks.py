@@ -1,8 +1,8 @@
 from src.core import analysers
-from src.core.models import AnalysedImage
 
 
 def analyse_image_task(analysed_image_id):
+    from src.core.models import AnalysedImage
     try:
         db_image = AnalysedImage.objects.get(id=analysed_image_id)
     except AnalysedImage.DoesNotExist:
