@@ -14,6 +14,7 @@ class AnalysedImage(models.Model):
     image = models.ImageField(upload_to='base/')
     recokgnition_result = JSONField(default={}, blank=True)
     job_id = models.CharField(max_length=50, default='', blank=True)
+    collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE)
 
     def enqueue_analysis(self):
         client = RedisAsyncClient()
