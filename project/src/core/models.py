@@ -12,7 +12,7 @@ class Collection(models.Model):
 
     def run_analysis(self):
         for image in self.analysed_images.all():
-            if not image.has_all_results:
+            if not image.processed:
                 image.enqueue_analysis()
 
     class Meta:
@@ -27,7 +27,7 @@ class AnalysedImage(models.Model):
     collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
 
     @property
-    def has_all_results(self):
+    def processed(self):
         return bool(self.recokgnition_result)
 
     def enqueue_analysis(self):
