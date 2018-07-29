@@ -72,6 +72,7 @@ if PRODUCTION:
     AWS_S3_HOST = config('AWS_S3_HOST')
     AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
     AWS_S3_SIGNATURE_VERSION = 's3v4'
+    S3_USE_SIGV4 = True
 
     S3_URL = '{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
     MEDIA_URL = S3_URL
