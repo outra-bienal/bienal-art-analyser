@@ -5,6 +5,11 @@ from proj_utils.redis import RedisAsyncClient
 from src.core.tasks import analyse_image_task
 
 
+class Collection(models.Model):
+    title = models.CharField(max_length=200)
+    date = models.DateField()
+
+
 class AnalysedImage(models.Model):
     image = models.ImageField(upload_to='base/')
     recokgnition_result = JSONField(default={}, blank=True)
