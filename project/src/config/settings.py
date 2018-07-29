@@ -1,5 +1,6 @@
 from unipath import Path
 
+import dj_database_url
 from decouple import config
 
 BASE_DIR = Path(__file__).ancestor(3)
@@ -78,10 +79,7 @@ if PRODUCTION:
     MEDIA_URL = S3_URL
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR.child('db.sqlite3'),
-    }
+    'default': dj_database_url.parse(config('DATABASE_URL'))
 }
 
 AUTH_PASSWORD_VALIDATORS = [
