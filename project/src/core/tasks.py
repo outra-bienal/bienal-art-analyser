@@ -1,0 +1,15 @@
+from src.core import analysers
+from src.core.models import AnalysedImage
+
+
+def analyse_image_task(analysed_image_id):
+    try:
+        db_image = AnalysedImage.objects.get(id=analysed_image_id)
+    except AnalysedImage.DoesNotExist:
+        return None
+
+    if not db_image.recokgnition_result:
+        result = analysers.aws_analyser(db_image.image.url)
+        if result:
+            db_image.recokgnition_result = result['Labels']
+            db_image.save(update_fields=['recokgnition_result'])
