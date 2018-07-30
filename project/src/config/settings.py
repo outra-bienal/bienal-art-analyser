@@ -132,7 +132,7 @@ SUIT_CONFIG = {
 
 # IBM Watson Visual Recognition Config
 IBM_WATSON_VISUAL_RECOG_VERSION = '2018-03-19'
-IBM_IAM_API_KEY = config('IBM_IAM_API_KEY')
+IBM_IAM_API_KEY = config('IBM_IAM_API_KEY', default='missing_key')
 
 
 import django_heroku
