@@ -3,6 +3,8 @@ from rest_framework.test import APITestCase
 
 from django.urls import reverse
 
+from src.api.serializers import CollectionDetailSerializer
+
 
 def formated_date(obj):
     if not obj:
@@ -24,6 +26,20 @@ class ListCollectionsTests(APITestCase):
             'date': formated_date(self.collection.date),
             'id': self.collection.id,
         }]
+
+        assert 200 == response.status_code
+        assert expected == response.json()
+
+
+class DetailCollectionTests(APITestCase):
+
+    def setUp(self):
+        self.collection = mommy.make('core.Collection')
+        self.url = reverse('api:list_collections', args=[self.collection.id])
+
+    def test_serialize_collection(self):
+        response = self.client.get(self.url)
+        expected = CollectionDetailSerializer(instance=self.collection).data
 
         assert 200 == response.status_code
         assert expected == response.json()

@@ -8,3 +8,10 @@ class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
         fields = '__all__'
+
+
+class CollectionDetailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Collection
+        fields = '__all__'
