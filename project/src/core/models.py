@@ -15,6 +15,10 @@ class Collection(models.Model):
             if not image.processed:
                 image.enqueue_analysis()
 
+    @property
+    def processed(self):
+        return all([i.processed for i in self.analysed_images.all()])
+
     class Meta:
         verbose_name = _('Coleção')
         verbose_name_plural = _('Coleções')

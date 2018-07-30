@@ -70,7 +70,7 @@ class CollectionAdmin(admin.ModelAdmin):
     )
 
     def processed(self, obj):
-        return all([i.processed for i in obj.analysed_images.all()])
+        return obj.processed
     processed.short_description = _('Já análizado')
     processed.boolean = True
 
