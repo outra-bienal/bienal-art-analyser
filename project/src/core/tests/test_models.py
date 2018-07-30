@@ -52,3 +52,11 @@ class AnalysedImageModelTests(TestCase):
             tasks.ibm_analyse_image_task, self.analysed_image.id
         )
         self.analysed_image.ibm_watson_job_id = '42'
+
+    def test_processed_tag(self):
+        assert self.analysed_image.processed is True
+        self.analysed_image.recokgnition_result = {}
+        assert self.analysed_image.processed is False
+        self.analysed_image.recokgnition_result = {'foo': 'bar'}
+        self.analysed_image.ibm_watson_result = {}
+        assert self.analysed_image.processed is False

@@ -34,7 +34,10 @@ class AnalysedImage(models.Model):
 
     @property
     def processed(self):
-        return bool(self.recokgnition_result)
+        return all([
+            self.recokgnition_result,
+            self.ibm_watson_result,
+        ])
 
     def enqueue_analysis(self):
         client = RedisAsyncClient()
