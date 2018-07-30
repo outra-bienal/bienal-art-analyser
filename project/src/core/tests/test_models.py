@@ -23,4 +23,4 @@ class AnalysedImageModelTests(TestCase):
         client.enqueue_default.assert_called_once_with(
             aws_analyse_image_task, self.analysed_image.id
         )
-        self.analysed_image.job_id = '42'
+        self.analysed_image.recokgnition_job_id = '42'

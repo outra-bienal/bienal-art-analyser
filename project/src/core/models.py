@@ -27,7 +27,9 @@ class Collection(models.Model):
 class AnalysedImage(models.Model):
     image = models.ImageField(upload_to='base/', verbose_name=_('Imagem'))
     recokgnition_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
-    job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Id job de análise'))
+    recokgnition_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Id job de análise'))
+    ibm_watson_result = JSONField(default={}, blank=True, verbose_name=_('IBM Watson'))
+    ibm_watson_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('IBM Watson Job'))
     collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
 
     @property
@@ -37,8 +39,8 @@ class AnalysedImage(models.Model):
     def enqueue_analysis(self):
         client = RedisAsyncClient()
         job = client.enqueue_default(aws_analyse_image_task, self.id)
-        self.job_id = str(job.id)
-        self.save(update_fields=['job_id'])
+        self.recokgnition_job_id = str(job.id)
+        self.save(update_fields=['recokgnition_job_id'])
 
     class Meta:
         verbose_name = _('Análise de Imagem')
