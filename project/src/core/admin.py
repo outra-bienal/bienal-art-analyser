@@ -1,3 +1,4 @@
+import json
 from urllib.parse import urlencode
 
 from django.contrib import admin
@@ -92,8 +93,8 @@ class CollectionAdmin(admin.ModelAdmin):
 class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
     list_display = ['id', 'preview', 'processed', 'link_to_collection']
     list_filter = ['collection__title']
-    exclude = ['job_id', 'collection', 'image', 'recokgnition_result']
-    readonly_fields = ['link_to_collection', 'preview', 'aws']
+    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id']
+    readonly_fields = ['link_to_collection', 'preview', 'aws', 'ibm']
 
     def link_to_collection(self, obj):
         link = reverse("admin:core_collection_change", args=[obj.collection.id])
@@ -106,15 +107,21 @@ class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
     processed.short_description = _('Já análizado')
     processed.boolean = True
 
-    def aws(self, obj):
-        if not obj.recokgnition_result:
+    def _display_result(self, result):
+        if not result:
             return '---'
         else:
-            import json
-            content = json.dumps(obj.recokgnition_result, indent=4, sort_keys=True).replace('\n', '<br/>')
+            content = json.dumps(result, indent=4, sort_keys=True).replace('\n', '<br/>')
             html = '<pre>{}</code>'.format(content)
             return mark_safe(html)
+
+    def aws(self, obj):
+        return self._display_result(obj.recokgnition_result)
     aws.short_description = _('AWS Recokgition')
+
+    def ibm(self, obj):
+        return self._display_result(obj.ibm_watson_result)
+    ibm.short_description = _('IBM Watson')
 
 
 admin.site.register(Collection, CollectionAdmin)
