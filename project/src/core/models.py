@@ -3,7 +3,7 @@ from django.contrib.postgres.fields import JSONField
 from django.utils.translation import gettext as _
 
 from proj_utils.redis import RedisAsyncClient
-from src.core.tasks import aws_analyse_image_task
+from src.core import tasks
 
 
 class Collection(models.Model):
@@ -38,9 +38,21 @@ class AnalysedImage(models.Model):
 
     def enqueue_analysis(self):
         client = RedisAsyncClient()
-        job = client.enqueue_default(aws_analyse_image_task, self.id)
-        self.recokgnition_job_id = str(job.id)
-        self.save(update_fields=['recokgnition_job_id'])
+
+        field_tasks = {
+            'recokgnition_result': (tasks.aws_analyse_image_task, 'recokgnition_job_id'),
+            'ibm_watson_result': (tasks.ibm_analyse_image_task, 'ibm_watson_job_id'),
+        }
+
+        update_fields = []
+        for fieldname, field_data in field_tasks.items():
+            task, job_id_field = field_data
+            if not getattr(self, fieldname):
+                job = client.enqueue_default(task, self.id)
+                setattr(self, job_id_field, str(job.id))
+                update_fields.append(job_id_field)
+
+        self.save(update_fields=update_fields)
 
     class Meta:
         verbose_name = _('Análise de Imagem')
