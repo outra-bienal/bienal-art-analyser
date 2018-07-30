@@ -3,14 +3,8 @@ from rest_framework.test import APITestCase
 
 from django.urls import reverse
 
+from .utils import formated_date
 from src.api.serializers import CollectionDetailSerializer
-
-
-def formated_date(obj):
-    if not obj:
-        return obj
-    isoformat = obj.isoformat()
-    return isoformat.split('+')[0]
 
 
 class ListCollectionsTests(APITestCase):
