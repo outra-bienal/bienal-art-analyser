@@ -33,10 +33,14 @@ class CollectionDetailSerializer(serializers.ModelSerializer):
 
 class AnalysedImageSerializer(serializers.ModelSerializer):
     amazonRekog = serializers.SerializerMethodField()
+    ibmwatson = serializers.SerializerMethodField()
 
     def get_amazonRekog(self, analysed_image):
         return analysed_image.recokgnition_result
 
+    def get_ibmwatson(self, analysed_image):
+        return analysed_image.ibm_watson_result
+
     class Meta:
         model = AnalysedImage
-        fields = ['image', 'processed', 'amazonRekog']
+        fields = ['image', 'processed', 'amazonRekog', 'ibmwatson']
