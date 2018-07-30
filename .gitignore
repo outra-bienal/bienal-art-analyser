@@ -12,3 +12,4 @@
 project/media/*
 .pytest_cache/
 srv/
+staticfiles/
