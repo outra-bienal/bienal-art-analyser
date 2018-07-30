@@ -20,7 +20,7 @@ class AnalyseImageTast(TestCase):
         analyse_image_task(self.analysed_image.id)
         self.analysed_image.refresh_from_db()
 
-        assert self.analysed_image.recokgnition_result == AWS_LABELS_RESPONSE['Labels']
+        assert self.analysed_image.recokgnition_result == AWS_LABELS_RESPONSE
         mocked_analyser.assert_called_once_with(self.analysed_image.image.url)
 
     @patch('src.core.tasks.analysers.aws_analyser')
