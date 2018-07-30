@@ -1,5 +1,7 @@
-import boto3
 from urllib.parse import urlparse
+
+import boto3
+from watson_developer_cloud import VisualRecognitionV3
 
 from django.conf import settings
 
@@ -22,6 +24,23 @@ def aws_analyser(image_url):
             'labels': client.detect_labels(Image=image),
             'faces': client.detect_faces(Image=image),
             'celebs': client.recognize_celebrities(Image=image)
+        }
+    except Exception as e:
+        print(e)
+        return None
+
+
+def ibm_analyser(image_url):
+    client = VisualRecognitionV3(
+        settings.IBM_WATSON_VISUAL_RECOG_VERSION,
+        iam_api_key=settings.IBM_IAM_API_KEY,
+    )
+
+    clean_url = image_url.split('?')[0]
+    try:
+        return {
+            'main': client.classify(url=clean_url)['images'][0],
+            'faces': {}  # TODO: https://github.com/watson-developer-cloud/python-sdk/issues/497
         }
     except Exception as e:
         print(e)
