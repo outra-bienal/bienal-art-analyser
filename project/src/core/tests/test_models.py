@@ -4,7 +4,7 @@ from unittest.mock import patch, Mock
 from django.test import TestCase
 
 from src.core.models import AnalysedImage
-from src.core.tasks import analyse_image_task
+from src.core.tasks import aws_analyse_image_task
 from proj_utils.redis import RedisAsyncClient
 
 
@@ -21,6 +21,6 @@ class AnalysedImageModelTests(TestCase):
         self.analysed_image.refresh_from_db()
 
         client.enqueue_default.assert_called_once_with(
-            analyse_image_task, self.analysed_image.id
+            aws_analyse_image_task, self.analysed_image.id
         )
         self.analysed_image.job_id = '42'
