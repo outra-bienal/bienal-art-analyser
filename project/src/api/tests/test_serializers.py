@@ -18,7 +18,6 @@ class AnalysedImageSerializerTests(TestCase):
         expected = {
             'image': analysed_image.image.url,
             'amazonRekog': {'foo': 'bar'},
-            'collection': CollectionSerializer(instance=analysed_image.collection).data,
             'processed': analysed_image.processed,
         }
 
