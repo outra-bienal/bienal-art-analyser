@@ -11,5 +11,5 @@ def analyse_image_task(analysed_image_id):
     if not db_image.recokgnition_result:
         result = analysers.aws_analyser(db_image.image.url)
         if result:
-            db_image.recokgnition_result = result['Labels']
+            db_image.recokgnition_result = result
             db_image.save(update_fields=['recokgnition_result'])

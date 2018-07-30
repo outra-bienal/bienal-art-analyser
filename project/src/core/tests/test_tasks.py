@@ -3,7 +3,7 @@ from model_mommy import mommy
 
 from django.test import TestCase
 
-from .sample_responses import AWS_RESPONSE
+from .sample_responses import AWS_LABELS_RESPONSE
 from src.core.models import AnalysedImage
 from src.core.tasks import analyse_image_task
 
@@ -15,12 +15,12 @@ class AnalyseImageTast(TestCase):
 
     @patch('src.core.tasks.analysers.aws_analyser')
     def test_populate_recokgnition_result_with_the_output(self, mocked_analyser):
-        mocked_analyser.return_value = AWS_RESPONSE
+        mocked_analyser.return_value = AWS_LABELS_RESPONSE
 
         analyse_image_task(self.analysed_image.id)
         self.analysed_image.refresh_from_db()
 
-        assert self.analysed_image.recokgnition_result == AWS_RESPONSE['Labels']
+        assert self.analysed_image.recokgnition_result == AWS_LABELS_RESPONSE
         mocked_analyser.assert_called_once_with(self.analysed_image.image.url)
 
     @patch('src.core.tasks.analysers.aws_analyser')

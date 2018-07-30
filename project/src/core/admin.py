@@ -5,6 +5,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from src.core.models import AnalysedImage, Collection
 
@@ -109,12 +110,10 @@ class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
         if not obj.recokgnition_result:
             return '---'
         else:
-            html = '<ul>'
-            for label in obj.recokgnition_result:
-                li = '<li>Label: <b>{}</b> ({} de confiança)</li>'
-                html += li.format(label['Name'], str(label['Confidence'])[:5])
-            html += '</ul>'
-            return format_html(html)
+            import json
+            content = json.dumps(obj.recokgnition_result, indent=4, sort_keys=True).replace('\n', '<br/>')
+            html = '<pre>{}</code>'.format(content)
+            return mark_safe(html)
     aws.short_description = _('AWS Recokgition')
 
 
