@@ -25,6 +25,8 @@ class ListCollectionsTests(APITestCase):
             'title': self.collection.title,
             'date': formated_date(self.collection.date),
             'id': self.collection.id,
+            'detail_url': reverse('api:list_collections', args=[self.collection.id]),
+            'processed': self.collection.processed,
         }]
 
         assert 200 == response.status_code
