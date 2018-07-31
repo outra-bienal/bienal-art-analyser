@@ -93,8 +93,8 @@ class CollectionAdmin(admin.ModelAdmin):
 class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
     list_display = ['id', 'preview', 'processed', 'link_to_collection']
     list_filter = ['collection__title']
-    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id']
-    readonly_fields = ['link_to_collection', 'preview', 'aws', 'ibm']
+    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'google_vision_result', 'google_vision_job_id']
+    readonly_fields = ['link_to_collection', 'preview', 'aws', 'ibm', 'google']
 
     def link_to_collection(self, obj):
         link = reverse("admin:core_collection_change", args=[obj.collection.id])
@@ -122,6 +122,10 @@ class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
     def ibm(self, obj):
         return self._display_result(obj.ibm_watson_result)
     ibm.short_description = _('IBM Watson')
+
+    def google(self, obj):
+        return self._display_result(obj.google_vision_result)
+    google.short_description = _('Google Vision Cloud')
 
 
 admin.site.register(Collection, CollectionAdmin)
