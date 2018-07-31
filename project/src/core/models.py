@@ -19,8 +19,6 @@ class Collection(models.Model):
     def processed(self):
         return all([i.processed for i in self.analysed_images.all()])
 
-    class Meta:
-        verbose_name = _('Coleção')
         verbose_name_plural = _('Coleções')
 
 
@@ -30,6 +28,8 @@ class AnalysedImage(models.Model):
     recokgnition_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Id job de análise'))
     ibm_watson_result = JSONField(default={}, blank=True, verbose_name=_('IBM Watson'))
     ibm_watson_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('IBM Watson Job'))
+    google_vision_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
+    google_vision_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Id job de análise'))
     collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
 
     @property
