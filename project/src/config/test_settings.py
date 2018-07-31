@@ -17,3 +17,4 @@ AWS_S3_REGION_NAME = 'region'
 
 IBM_IAM_API_KEY = 'ibm_api_key'
 GOOGLE_VISION_API_KEY = 'google_api_key'
+AZURE_VISION_API_KEY = 'azure_api_key'
