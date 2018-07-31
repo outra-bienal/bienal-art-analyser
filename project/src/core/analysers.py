@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 
 import boto3
+import requests
 from watson_developer_cloud import VisualRecognitionV3
 
 from django.conf import settings
@@ -45,3 +46,24 @@ def ibm_analyser(image_url):
     except Exception as e:
         print(e)
         return None
+
+
+def google_analyser(image_url):
+    image_url = image_url.split('?')[0]
+    api_url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(settings.GOOGLE_VISION_API_KEY)
+    request = {
+        "image": {"source": {"imageUri": image_url}},
+        "features": [
+            {"type": "FACE_DETECTION"},
+            {"type": "LABEL_DETECTION"},
+            {"type": "LANDMARK_DETECTION"},
+            {"type": "WEB_DETECTION"},
+            {"type": "IMAGE_PROPERTIES"},
+            {"type": "SAFE_SEARCH_DETECTION"},
+            {"type": "DOCUMENT_TEXT_DETECTION"}
+        ]
+    }
+
+    response = requests.post(api_url, json={'requests': [request]})
+    if response.ok:
+        return response.json()['responses'][0]
