@@ -14,6 +14,7 @@ class AnalysedImageSerializerTests(TestCase):
             AnalysedImage,
             recokgnition_result={'foo': 'bar'},
             ibm_watson_result={'ibm': 'data'},
+            google_vision_result={'google': 'data'},
             _create_files=True
         )
 
@@ -22,6 +23,7 @@ class AnalysedImageSerializerTests(TestCase):
             'image': analysed_image.image.url,
             'amazonRekog': {'foo': 'bar'},
             'ibmwatson': {'ibm': 'data'},
+            'googlecloud': {'google': 'data'},
             'processed': analysed_image.processed,
         }
 
