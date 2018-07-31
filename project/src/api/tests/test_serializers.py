@@ -12,18 +12,20 @@ class AnalysedImageSerializerTests(TestCase):
     def test_serialize_analysed_image(self):
         analysed_image = mommy.make(
             AnalysedImage,
-            recokgnition_result={'foo': 'bar'},
+            recokgnition_result={'aws': 'bar'},
             ibm_watson_result={'ibm': 'data'},
             google_vision_result={'google': 'data'},
+            azure_vision_result={'azure': 'data'},
             _create_files=True
         )
 
         serializer = AnalysedImageSerializer(instance=analysed_image)
         expected = {
             'image': analysed_image.image.url,
-            'amazonRekog': {'foo': 'bar'},
+            'amazonRekog': {'aws': 'bar'},
             'ibmwatson': {'ibm': 'data'},
             'googlecloud': {'google': 'data'},
+            'microsoftazure': {'azure': 'data'},
             'processed': analysed_image.processed,
         }
 

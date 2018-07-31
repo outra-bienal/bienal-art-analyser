@@ -35,6 +35,7 @@ class AnalysedImageSerializer(serializers.ModelSerializer):
     amazonRekog = serializers.SerializerMethodField()
     ibmwatson = serializers.SerializerMethodField()
     googlecloud = serializers.SerializerMethodField()
+    microsoftazure = serializers.SerializerMethodField()
 
     def get_amazonRekog(self, analysed_image):
         return analysed_image.recokgnition_result
@@ -45,6 +46,9 @@ class AnalysedImageSerializer(serializers.ModelSerializer):
     def get_googlecloud(self, analysed_image):
         return analysed_image.google_vision_result
 
+    def get_microsoftazure(self, analysed_image):
+        return analysed_image.azure_vision_result
+
     class Meta:
         model = AnalysedImage
-        fields = ['image', 'processed', 'amazonRekog', 'ibmwatson', 'googlecloud']
+        fields = ['image', 'processed', 'amazonRekog', 'ibmwatson', 'googlecloud', 'microsoftazure']
