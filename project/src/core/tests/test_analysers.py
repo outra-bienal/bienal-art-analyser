@@ -97,7 +97,11 @@ class TestGoogleAnalyser(TestCase):
     def test_return_response_if_success(self):
         url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(settings.GOOGLE_VISION_API_KEY)
         responses.add(
-            responses.POST, url, json=GOOGLE_ANNOTATE_RESPONSE, status=200
+            responses.POST,
+            url,
+            json=GOOGLE_ANNOTATE_RESPONSE,
+            status=200,
+            match_querystring=True
         )
 
         clean_url = 'https://bienal-image-analyser.s3.amazonaws.com/folder/img.jpg'
@@ -123,7 +127,11 @@ class TestGoogleAnalyser(TestCase):
     def test_fails_silently_if_error(self):
         url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(settings.GOOGLE_VISION_API_KEY)
         responses.add(
-            responses.POST, url, json={'some': 'error'}, status=400
+            responses.POST,
+            url,
+            json={'some': 'error'},
+            status=400,
+            match_querystring=True
         )
 
         data = google_analyser(self.image_url)

@@ -50,7 +50,8 @@ def ibm_analyser(image_url):
 
 def google_analyser(image_url):
     image_url = image_url.split('?')[0]
-    api_url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(settings.GOOGLE_VISION_API_KEY)
+    qs = {'key': settings.GOOGLE_VISION_API_KEY}
+    api_url = 'https://vision.googleapis.com/v1/images:annotate'
     request = {
         "image": {"source": {"imageUri": image_url}},
         "features": [
@@ -64,6 +65,6 @@ def google_analyser(image_url):
         ]
     }
 
-    response = requests.post(api_url, json={'requests': [request]})
+    response = requests.post(api_url, json={'requests': [request]}, params=qs)
     if response.ok:
         return response.json()['responses'][0]
