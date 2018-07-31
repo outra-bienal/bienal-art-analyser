@@ -42,6 +42,7 @@ class AnalysedImage(models.Model):
             self.recokgnition_result,
             self.ibm_watson_result,
             self.google_vision_result,
+            self.azure_vision_result,
         ])
 
     def enqueue_analysis(self):
@@ -51,6 +52,7 @@ class AnalysedImage(models.Model):
             'recokgnition_result': (tasks.aws_analyse_image_task, 'recokgnition_job_id'),
             'ibm_watson_result': (tasks.ibm_analyse_image_task, 'ibm_watson_job_id'),
             'google_vision_result': (tasks.google_analyse_image_task, 'google_vision_job_id'),
+            'azure_vision_result': (tasks.azure_analyse_image_task, 'azure_vision_job_id'),
         }
 
         update_fields = []

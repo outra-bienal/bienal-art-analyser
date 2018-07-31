@@ -16,6 +16,7 @@ class AnalysedImageModelTests(TestCase):
             recokgnition_result={'fake': 'data'},
             ibm_watson_result={'fake': 'data'},
             google_vision_result={'fake': 'data'},
+            azure_vision_result={'fake': 'data'},
         )
 
     @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
@@ -68,6 +69,20 @@ class AnalysedImageModelTests(TestCase):
         )
         self.analysed_image.google_vision_job_id = '42'
 
+    @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
+    def test_enqueue_azure_analysis(self):
+        self.analysed_image.azure_vision_result = {}
+        self.analysed_image.save()
+        client = RedisAsyncClient()
+
+        self.analysed_image.enqueue_analysis()
+        self.analysed_image.refresh_from_db()
+
+        client.enqueue_default.assert_called_once_with(
+            tasks.azure_analyse_image_task, self.analysed_image.id
+        )
+        self.analysed_image.azure_vision_job_id = '42'
+
     def test_processed_tag(self):
         assert self.analysed_image.processed is True
         self.analysed_image.recokgnition_result = {}
@@ -77,4 +92,7 @@ class AnalysedImageModelTests(TestCase):
         assert self.analysed_image.processed is False
         self.analysed_image.ibm_watson_result = {'foo': 'bar'}
         self.analysed_image.google_vision_result = {}
+        assert self.analysed_image.processed is False
+        self.analysed_image.google_vision_result = {'foo': 'bar'}
+        self.analysed_image.azure_vision_result = {}
         assert self.analysed_image.processed is False
