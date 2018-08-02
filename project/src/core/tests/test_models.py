@@ -99,7 +99,7 @@ class AnalysedImageModelTests(TestCase):
         self.analysed_image.refresh_from_db()
 
         client.enqueue_default.assert_called_once_with(
-            tasks.yolo_analyse_image_task, self.analysed_image.id
+            tasks.yolo_detect_image_task, self.analysed_image.id
         )
         self.analysed_image.yolo_job_id = '42'
 

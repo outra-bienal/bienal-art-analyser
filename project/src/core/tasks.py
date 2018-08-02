@@ -60,7 +60,7 @@ def azure_analyse_image_task(analysed_image_id):
         db_image.save(update_fields=['azure_vision_result'])
 
 
-def yolo_analyse_image_task(analysed_image_id):
+def yolo_detect_image_task(analysed_image_id):
     from src.core.models import AnalysedImage
     try:
         db_image = AnalysedImage.objects.get(id=analysed_image_id)
