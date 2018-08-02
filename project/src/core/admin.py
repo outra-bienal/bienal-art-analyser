@@ -11,10 +11,10 @@ from django.utils.safestring import mark_safe
 from src.core.models import AnalysedImage, Collection
 
 
-def preview(url):
+def preview(url, width='20em'):
     template = """<img src="{url}" style="max-width: {size};" />"""
     config = {
-        'image_size': '20em',
+        'image_size': width,
     }
     content = template.format(url=url, size=config['image_size'])
     return format_html(content)
@@ -64,7 +64,7 @@ class CollectionAdmin(admin.ModelAdmin):
 
 
 class AnalysedImageAdmin(admin.ModelAdmin):
-    list_display = ['id', 'preview', 'processed', 'link_to_collection']
+    list_display = ['id', 'preview_list', 'processed', 'link_to_collection']
     list_filter = ['collection__title']
     exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id', 'yolo_image', 'yolo_job_id']
     readonly_fields = ['link_to_collection', 'preview', 'yolo', 'aws', 'ibm', 'google', 'azure']
@@ -75,13 +75,17 @@ class AnalysedImageAdmin(admin.ModelAdmin):
         return format_html(tag)
     link_to_collection.short_description = _('Coleção')
 
-    def preview(self, obj):
+    def preview_list(self, obj):
         return preview(obj.image.url)
+    preview_list.short_description = _('Preview')
+
+    def preview(self, obj):
+        return preview(obj.image.url, "50em")
     preview.short_description = _('Preview')
 
     def yolo(self, obj):
         if obj.yolo_image:
-            return preview(obj.yolo_image.url)
+            return preview(obj.yolo_image.url, "50em")
         return '---'
 
     def processed(self, obj):
