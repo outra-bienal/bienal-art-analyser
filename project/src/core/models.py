@@ -35,6 +35,7 @@ class AnalysedImage(models.Model):
     azure_vision_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
     azure_vision_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Id job de análise'))
     collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
+    yolo_image = models.ImageField(upload_to='yolo/', verbose_name=_('Output YOLO'))
 
     @property
     def processed(self):
