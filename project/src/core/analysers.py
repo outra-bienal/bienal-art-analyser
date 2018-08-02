@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode
 
 import boto3
 import requests
@@ -50,7 +50,8 @@ def ibm_analyser(image_url):
 
 def google_analyser(image_url):
     image_url = image_url.split('?')[0]
-    api_url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(settings.GOOGLE_VISION_API_KEY)
+    qs = {'key': settings.GOOGLE_VISION_API_KEY}
+    api_url = 'https://vision.googleapis.com/v1/images:annotate'
     request = {
         "image": {"source": {"imageUri": image_url}},
         "features": [
@@ -64,6 +65,22 @@ def google_analyser(image_url):
         ]
     }
 
-    response = requests.post(api_url, json={'requests': [request]})
+    response = requests.post(api_url, json={'requests': [request]}, params=qs)
     if response.ok:
         return response.json()['responses'][0]
+
+
+def azure_analyser(image_url):
+    url = 'https://brazilsouth.api.cognitive.microsoft.com/vision/v1.0/analyze'
+    qs = {
+        'visualFeatures': 'Categories,Tags,Description,Faces,ImageType,Color,Adult',
+        'details': 'Celebrities,Landmarks',
+        'language': 'en'
+    }
+    headers = {'Ocp-Apim-Subscription-Key': settings.AZURE_VISION_API_KEY}
+
+    image_url = image_url.split('?')[0]
+    response = requests.post(url, headers=headers, params=qs, json={'url': image_url})
+
+    if response.ok:
+        return {'main': response.json()}

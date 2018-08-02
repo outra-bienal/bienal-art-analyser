@@ -134,6 +134,7 @@ SUIT_CONFIG = {
 IBM_WATSON_VISUAL_RECOG_VERSION = '2018-03-19'
 IBM_IAM_API_KEY = config('IBM_IAM_API_KEY', default='missing_key')
 GOOGLE_VISION_API_KEY = config('GOOGLE_VISION_API_KEY', default='missing_key')
+AZURE_VISION_API_KEY = config('AZURE_VISION_API_KEY', default='missing_key')
 
 
 import django_heroku

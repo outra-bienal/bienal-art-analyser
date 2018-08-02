@@ -1,3 +1,4 @@
+from urllib.parse import urlencode
 import json
 import responses
 from unittest.mock import Mock, patch
@@ -7,7 +8,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from .sample_responses import *
-from src.core.analysers import aws_analyser, ibm_analyser, google_analyser
+from src.core.analysers import aws_analyser, ibm_analyser, google_analyser, azure_analyser
 
 
 class TestAWSAnalyser(TestCase):
@@ -97,7 +98,11 @@ class TestGoogleAnalyser(TestCase):
     def test_return_response_if_success(self):
         url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(settings.GOOGLE_VISION_API_KEY)
         responses.add(
-            responses.POST, url, json=GOOGLE_ANNOTATE_RESPONSE, status=200
+            responses.POST,
+            url,
+            json=GOOGLE_ANNOTATE_RESPONSE,
+            status=200,
+            match_querystring=True
         )
 
         clean_url = 'https://bienal-image-analyser.s3.amazonaws.com/folder/img.jpg'
@@ -123,9 +128,60 @@ class TestGoogleAnalyser(TestCase):
     def test_fails_silently_if_error(self):
         url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(settings.GOOGLE_VISION_API_KEY)
         responses.add(
-            responses.POST, url, json={'some': 'error'}, status=400
+            responses.POST,
+            url,
+            json={'some': 'error'},
+            status=400,
+            match_querystring=True
         )
 
         data = google_analyser(self.image_url)
+
+        assert data is None
+
+
+class TestAzureAnalyser(TestCase):
+    image_url = 'https://bienal-image-analyser.s3.amazonaws.com/folder/img.jpg?X-Amz-Algorithm=AWS4-HMAC'
+
+    def setUp(self):
+        qs = {
+            'visualFeatures': 'Categories,Tags,Description,Faces,ImageType,Color,Adult',
+            'details': 'Celebrities,Landmarks',
+            'language': 'en'
+        }
+        api_url = 'https://brazilsouth.api.cognitive.microsoft.com/vision/v1.0/analyze'
+        self.url = api_url + '?' + urlencode(qs)
+        self.headers = {'Ocp-Apim-Subscription-Key': settings.AZURE_VISION_API_KEY}
+
+    @responses.activate
+    def test_return_response_if_success(self):
+        responses.add(
+            responses.POST,
+            self.url,
+            json=AZURE_ANALYSE_RESPONSE,
+            status=200,
+            match_querystring=True,
+            headers=self.headers,
+        )
+
+        data = azure_analyser(self.image_url)
+        expected_request = {'url': self.image_url.split('?')[0]}
+
+        json_data = json.loads(responses.calls[0].request.body)
+        assert AZURE_ANALYSE_RESPONSE == data['main']
+        assert expected_request == json_data
+
+    @responses.activate
+    def test_fails_silently_if_error(self):
+        responses.add(
+            responses.POST,
+            self.url,
+            json={'some': 'error'},
+            status=400,
+            match_querystring=True,
+            headers=self.headers,
+        )
+
+        data = azure_analyser(self.image_url)
 
         assert data is None
