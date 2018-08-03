@@ -69,6 +69,9 @@ class AnalysedImageAdmin(admin.ModelAdmin):
     exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id', 'yolo_image', 'yolo_job_id']
     readonly_fields = ['link_to_collection', 'preview', 'yolo', 'aws', 'ibm', 'google', 'azure']
 
+    def has_add_permission(self, request):
+        return False
+
     def link_to_collection(self, obj):
         link = reverse("admin:core_collection_change", args=[obj.collection.id])
         tag = '<a href="%s">%s</a>' % (link, obj.collection.title)
