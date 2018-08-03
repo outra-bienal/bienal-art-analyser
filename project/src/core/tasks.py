@@ -68,17 +68,22 @@ def yolo_detect_image_task(analysed_image_id):
         return None
 
     filename = db_image.image.name.split('/')[-1]
+    clean_filename = filename.split('.')[0]
     temp_file = Path('/', 'tmp', filename)
 
     with open(temp_file, 'bw') as fd:
         fd.write(db_image.image.read())
 
+    pred_file = Path(settings.DARKNET_DIR, 'pred-{}.png'.format(clean_filename))
     detect_command = [
         settings.DARKNET_BIN,
         'detect',
         settings.YOLO_CONF,
         settings.YOLO_WEIGHTS,
-        temp_file
+        temp_file,
+        '-out',
+        pred_file.name.split('.')[0],
+
     ]
     print('Exec --> {}'.format(' '.join(detect_command)))
 
@@ -90,8 +95,7 @@ def yolo_detect_image_task(analysed_image_id):
     )
     detect.wait()
 
-    pred_file = Path(settings.DARKNET_DIR, 'predictions.png')
-    out_filename = '{}.png'.format(filename.split('.')[0])
+    out_filename = '{}.png'.format(clean_filename)
     with open(pred_file, 'rb') as fd:
         db_image.yolo_image.name = out_filename
         with db_image.yolo_image.open('wb') as out:
