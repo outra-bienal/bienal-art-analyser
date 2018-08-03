@@ -137,10 +137,10 @@ GOOGLE_VISION_API_KEY = config('GOOGLE_VISION_API_KEY', default='missing_key')
 AZURE_VISION_API_KEY = config('AZURE_VISION_API_KEY', default='missing_key')
 
 #YOLO config
-DARKNET_DIR = config('DARKNET_DIR', cast=Path)
-DARKNET_BIN = config('DARKNET_BIN')
-YOLO_CONF = config('YOLO_CONF')
-YOLO_WEIGHTS = config('YOLO_WEIGHTS')
+#DARKNET_DIR = config('DARKNET_DIR', cast=Path)
+#DARKNET_BIN = config('DARKNET_BIN')
+#YOLO_CONF = config('YOLO_CONF')
+#YOLO_WEIGHTS = config('YOLO_WEIGHTS')
 
 import django_heroku
 django_heroku.settings(locals())
