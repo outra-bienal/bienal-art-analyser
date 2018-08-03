@@ -11,40 +11,13 @@ from django.utils.safestring import mark_safe
 from src.core.models import AnalysedImage, Collection
 
 
-class AdminFancyPreview(object):
-    '''
-    This will add a thumbnail image, a fancy preview for your Django admin
-    list page. Let's say you have a model that has an image field. With this
-    helper you will be able to display a thumbnail in the admin list page.
-    For example:
-        class ProductAdmin(AdminFancyPreview, admin.ModelAdmin):
-            list_display = ('name', 'preview')
-    By default we will assume that you have an image field named `image`.
-    If that's not the case, you will have to customize things.
-        class ProductAdmin(AdminFancyPreview, admin.ModelAdmin):
-            list_display = ('name', 'preview')
-            fancy_preview = {
-                'image_field': 'photo',
-                'image_size': '60px',
-            }
-    Note how you can customize the image field name but also the thumbnail size
-    by defining a `fancy_preview` dictionary.
-    '''
-
-    def preview(self, obj):
-        template = """<img src="{url}" style="max-width: {size};" />"""
-        config = {
-            'image_field': 'image',
-            'image_size': '20em',
-        }
-        custom_config = getattr(self, 'fancy_preview', {})
-        config.update(custom_config)
-        image = getattr(obj, config['image_field'], None)
-        url = image.url if image else ''
-        content = template.format(url=url, size=config['image_size'])
-        return format_html(content)
-    preview.short_description=_('Preview')
-    preview.allow_tags = True
+def preview(url, width='20em'):
+    template = """<img src="{url}" style="max-width: {size};" />"""
+    config = {
+        'image_size': width,
+    }
+    content = template.format(url=url, size=config['image_size'])
+    return format_html(content)
 
 
 class AnalysedImageInline(admin.TabularInline):
@@ -90,17 +63,30 @@ class CollectionAdmin(admin.ModelAdmin):
     run_analysis.short_description = _('Roda AI nas imagens da coleção')
 
 
-class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
-    list_display = ['id', 'preview', 'processed', 'link_to_collection']
+class AnalysedImageAdmin(admin.ModelAdmin):
+    list_display = ['id', 'preview_list', 'processed', 'link_to_collection']
     list_filter = ['collection__title']
-    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id']
-    readonly_fields = ['link_to_collection', 'preview', 'aws', 'ibm', 'google', 'azure']
+    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id', 'yolo_image', 'yolo_job_id']
+    readonly_fields = ['link_to_collection', 'preview', 'yolo', 'aws', 'ibm', 'google', 'azure']
 
     def link_to_collection(self, obj):
         link = reverse("admin:core_collection_change", args=[obj.collection.id])
         tag = '<a href="%s">%s</a>' % (link, obj.collection.title)
         return format_html(tag)
     link_to_collection.short_description = _('Coleção')
+
+    def preview_list(self, obj):
+        return preview(obj.image.url)
+    preview_list.short_description = _('Preview')
+
+    def preview(self, obj):
+        return preview(obj.image.url, "50em")
+    preview.short_description = _('Preview')
+
+    def yolo(self, obj):
+        if obj.yolo_image:
+            return preview(obj.yolo_image.url, "50em")
+        return '---'
 
     def processed(self, obj):
         return obj.processed

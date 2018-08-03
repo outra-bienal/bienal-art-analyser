@@ -27,6 +27,7 @@ class AnalysedImageSerializerTests(TestCase):
             'googlecloud': {'google': 'data'},
             'microsoftazure': {'azure': 'data'},
             'processed': analysed_image.processed,
+            'yolo_image': analysed_image.yolo_image.url,
         }
 
         assert expected == serializer.data

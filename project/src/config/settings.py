@@ -130,12 +130,17 @@ SUIT_CONFIG = {
 }
 
 
-# IBM Watson Visual Recognition Config
+# Image Analysis Services
 IBM_WATSON_VISUAL_RECOG_VERSION = '2018-03-19'
 IBM_IAM_API_KEY = config('IBM_IAM_API_KEY', default='missing_key')
 GOOGLE_VISION_API_KEY = config('GOOGLE_VISION_API_KEY', default='missing_key')
 AZURE_VISION_API_KEY = config('AZURE_VISION_API_KEY', default='missing_key')
 
+#YOLO config
+DARKNET_DIR = config('DARKNET_DIR', cast=Path)
+DARKNET_BIN = config('DARKNET_BIN')
+YOLO_CONF = config('YOLO_CONF')
+YOLO_WEIGHTS = config('YOLO_WEIGHTS')
 
 import django_heroku
 django_heroku.settings(locals())
