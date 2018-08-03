@@ -1,5 +1,6 @@
 from urllib.parse import urlparse, urlencode
 
+import json
 import boto3
 import requests
 from watson_developer_cloud import VisualRecognitionV3
@@ -38,10 +39,11 @@ def ibm_analyser(image_url):
     )
 
     clean_url = image_url.split('?')[0]
+    params = json.dumps({'url': clean_url})
     try:
         return {
             'main': client.classify(url=clean_url)['images'][0],
-            'faces': {}  # TODO: https://github.com/watson-developer-cloud/python-sdk/issues/497
+            'faces': client.detect_faces(parameters=params)['images'][0],
         }
     except Exception as e:
         print(e)

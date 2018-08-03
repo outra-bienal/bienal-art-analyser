@@ -63,13 +63,15 @@ class TestIBMAnalyser(TestCase):
     def test_return_response_if_success(self, MockedVisualRecognitionV3):
         client = Mock(VisualRecognitionV3)
         client.classify.return_value = IBM_CLASSIFY_RESPONSE
+        client.detect_faces.return_value = IBM_FACES_RESPONSE
         MockedVisualRecognitionV3.return_value = client
 
         clean_url = 'https://bienal-image-analyser.s3.amazonaws.com/folder/img.jpg'
+        face_params = json.dumps({'url': clean_url})
         data = ibm_analyser(self.image_url)
         expected = {
             'main': IBM_CLASSIFY_RESPONSE['images'][0],
-            'faces': {},
+            'faces': IBM_FACES_RESPONSE['images'][0],
         }
 
         assert expected == data
@@ -79,6 +81,7 @@ class TestIBMAnalyser(TestCase):
         )
         kwargs = {'url': clean_url}
         client.classify.assert_called_once_with(**kwargs)
+        client.detect_faces.assert_called_once_with(parameters=face_params)
 
     @patch('src.core.analysers.VisualRecognitionV3')
     def test_return_none_if_any_error(self, MockedVisualRecognitionV3):
