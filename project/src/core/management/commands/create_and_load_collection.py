@@ -12,19 +12,8 @@ class Command(BaseCommand):
     help = _('Cria coleção e faz upload de arquivos no diretório')
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            'titulo_colecao',
-            type=str,
-            help=_('Título da coleção a ser criada.')
-        )
-        help = _(
-            'Nome (relatavio a {}) da coleção a ser criada.'.format(settings.LOAD_COLLECTIONS_DIR)
-        )
-        parser.add_argument(
-            'nome_diretorio_imagens',
-            type=str,
-            help=help,
-        )
+        parser.add_argument('titulo_colecao', type=str)
+        parser.add_argument('nome_diretorio_imagens', type=str)
 
     def handle(self, *args, **kwargs):
         collection_title = kwargs['titulo_colecao']
