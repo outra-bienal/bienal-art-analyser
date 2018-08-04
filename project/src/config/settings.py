@@ -12,7 +12,8 @@ DEBUG = config('DEBUG', cast=bool)
 SECRET_KEY = config('SECRET_KEY')
 PRODUCTION = config('PRODUCTION', default=False)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [config('APP_HOST', default='')]
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 INSTALLED_APPS = [
@@ -24,13 +25,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'raven.contrib.django.raven_compat',
+    'rest_framework',
     'django_extensions',
+    'corsheaders',
     'django_rq',
     'storages',
+    'src.api',
     'src.core',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -123,6 +128,19 @@ RQ_QUEUES = {
 SUIT_CONFIG = {
     'ADMIN_NAME': 'Bienal Art Analyser',
 }
+
+
+# Image Analysis Services
+IBM_WATSON_VISUAL_RECOG_VERSION = '2018-03-19'
+IBM_IAM_API_KEY = config('IBM_IAM_API_KEY', default='missing_key')
+GOOGLE_VISION_API_KEY = config('GOOGLE_VISION_API_KEY', default='missing_key')
+AZURE_VISION_API_KEY = config('AZURE_VISION_API_KEY', default='missing_key')
+
+#YOLO config
+DARKNET_DIR = config('DARKNET_DIR', cast=Path)
+DARKNET_BIN = config('DARKNET_BIN', default=DARKNET_DIR.child('darknet'))
+YOLO_CONF = config('YOLO_CONF', default=DARKNET_DIR.child('cfg', 'yolov3.cfg'))
+YOLO_WEIGHTS = config('YOLO_WEIGHTS', default=DARKNET_DIR.child('yolov3.weights'))
 
 import django_heroku
 django_heroku.settings(locals())

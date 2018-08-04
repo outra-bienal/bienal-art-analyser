@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "dokku": {
+      "postdeploy": "python project/manage.py migrate --no-input"
+    }
+  }
+}

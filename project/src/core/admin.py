@@ -1,3 +1,4 @@
+import json
 from urllib.parse import urlencode
 
 from django.contrib import admin
@@ -5,44 +6,18 @@ from django.utils.html import format_html
 from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from src.core.models import AnalysedImage, Collection
 
 
-class AdminFancyPreview(object):
-    '''
-    This will add a thumbnail image, a fancy preview for your Django admin
-    list page. Let's say you have a model that has an image field. With this
-    helper you will be able to display a thumbnail in the admin list page.
-    For example:
-        class ProductAdmin(AdminFancyPreview, admin.ModelAdmin):
-            list_display = ('name', 'preview')
-    By default we will assume that you have an image field named `image`.
-    If that's not the case, you will have to customize things.
-        class ProductAdmin(AdminFancyPreview, admin.ModelAdmin):
-            list_display = ('name', 'preview')
-            fancy_preview = {
-                'image_field': 'photo',
-                'image_size': '60px',
-            }
-    Note how you can customize the image field name but also the thumbnail size
-    by defining a `fancy_preview` dictionary.
-    '''
-
-    def preview(self, obj):
-        template = """<img src="{url}" style="max-width: {size};" />"""
-        config = {
-            'image_field': 'image',
-            'image_size': '20em',
-        }
-        custom_config = getattr(self, 'fancy_preview', {})
-        config.update(custom_config)
-        image = getattr(obj, config['image_field'], None)
-        url = image.url if image else ''
-        content = template.format(url=url, size=config['image_size'])
-        return format_html(content)
-    preview.short_description=_('Preview')
-    preview.allow_tags = True
+def preview(url, width='20em'):
+    template = """<img src="{url}" style="max-width: {size};" />"""
+    config = {
+        'image_size': width,
+    }
+    content = template.format(url=url, size=config['image_size'])
+    return format_html(content)
 
 
 class AnalysedImageInline(admin.TabularInline):
@@ -69,7 +44,7 @@ class CollectionAdmin(admin.ModelAdmin):
     )
 
     def processed(self, obj):
-        return all([i.processed for i in obj.analysed_images.all()])
+        return obj.processed
     processed.short_description = _('Já análizado')
     processed.boolean = True
 
@@ -88,11 +63,14 @@ class CollectionAdmin(admin.ModelAdmin):
     run_analysis.short_description = _('Roda AI nas imagens da coleção')
 
 
-class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
-    list_display = ['id', 'preview', 'processed', 'link_to_collection']
+class AnalysedImageAdmin(admin.ModelAdmin):
+    list_display = ['id', 'preview_list', 'processed', 'link_to_collection']
     list_filter = ['collection__title']
-    exclude = ['job_id', 'collection', 'image', 'recokgnition_result']
-    readonly_fields = ['link_to_collection', 'preview', 'aws']
+    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id', 'yolo_image', 'yolo_job_id']
+    readonly_fields = ['link_to_collection', 'preview', 'yolo', 'aws', 'ibm', 'google', 'azure']
+
+    def has_add_permission(self, request):
+        return False
 
     def link_to_collection(self, obj):
         link = reverse("admin:core_collection_change", args=[obj.collection.id])
@@ -100,22 +78,47 @@ class AnalysedImageAdmin(AdminFancyPreview, admin.ModelAdmin):
         return format_html(tag)
     link_to_collection.short_description = _('Coleção')
 
+    def preview_list(self, obj):
+        return preview(obj.image.url)
+    preview_list.short_description = _('Preview')
+
+    def preview(self, obj):
+        return preview(obj.image.url, "50em")
+    preview.short_description = _('Preview')
+
+    def yolo(self, obj):
+        if obj.yolo_image:
+            return preview(obj.yolo_image.url, "50em")
+        return '---'
+
     def processed(self, obj):
         return obj.processed
     processed.short_description = _('Já análizado')
     processed.boolean = True
 
-    def aws(self, obj):
-        if not obj.recokgnition_result:
+    def _display_result(self, result):
+        if not result:
             return '---'
         else:
-            html = '<ul>'
-            for label in obj.recokgnition_result:
-                li = '<li>Label: <b>{}</b> ({} de confiança)</li>'
-                html += li.format(label['Name'], str(label['Confidence'])[:5])
-            html += '</ul>'
-            return format_html(html)
+            content = json.dumps(result, indent=4, sort_keys=True).replace('\n', '<br/>')
+            html = '<pre>{}</code>'.format(content)
+            return mark_safe(html)
+
+    def aws(self, obj):
+        return self._display_result(obj.recokgnition_result)
     aws.short_description = _('AWS Recokgition')
+
+    def ibm(self, obj):
+        return self._display_result(obj.ibm_watson_result)
+    ibm.short_description = _('IBM Watson')
+
+    def google(self, obj):
+        return self._display_result(obj.google_vision_result)
+    google.short_description = _('Google Vision Cloud')
+
+    def azure(self, obj):
+        return self._display_result(obj.azure_vision_result)
+    azure.short_description = _('Azure Computer Vision')
 
 
 admin.site.register(Collection, CollectionAdmin)
