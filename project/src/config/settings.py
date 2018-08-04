@@ -12,7 +12,7 @@ DEBUG = config('DEBUG', cast=bool)
 SECRET_KEY = config('SECRET_KEY')
 PRODUCTION = config('PRODUCTION', default=False)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [config('APP_HOST', default='')]
 CORS_ORIGIN_ALLOW_ALL = True
 
 
