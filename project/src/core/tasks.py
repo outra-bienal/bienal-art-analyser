@@ -89,8 +89,8 @@ def yolo_detect_image_task(analysed_image_id):
 
     detect = subprocess.Popen(
         shlex.split(command),
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        #stdout=subprocess.DEVNULL,
+        #stderr=subprocess.DEVNULL,
         cwd=settings.DARKNET_DIR,
     )
     detect.wait()
