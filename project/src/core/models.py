@@ -25,7 +25,9 @@ class Collection(models.Model):
 
 
 class AnalysedImage(models.Model):
-    image = models.ImageField(upload_to='base/', verbose_name=_('Imagem'))
+    BASE_UPLOAD, YOLO_UPLOAD = 'base/', 'yolo/'
+
+    image = models.ImageField(upload_to=BASE_UPLOAD, verbose_name=_('Imagem'))
     recokgnition_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
     recokgnition_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Id job de análise'))
     ibm_watson_result = JSONField(default={}, blank=True, verbose_name=_('IBM Watson'))
@@ -35,7 +37,7 @@ class AnalysedImage(models.Model):
     azure_vision_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
     azure_vision_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Azure Job'))
     collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
-    yolo_image = models.ImageField(upload_to='yolo/', verbose_name=_('Output YOLO'))
+    yolo_image = models.ImageField(upload_to=YOLO_UPLOAD, verbose_name=_('Output YOLO'))
     yolo_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Yolo Job'))
 
     @property
@@ -71,9 +73,9 @@ class AnalysedImage(models.Model):
 
     def write_yolo_file(self, pred_file):
         """pred_file must ben unipath.Path object"""
-        raw_name = self.image.name.split('/')[-1].split('.')[0]
+        raw_name = Path(self.image.path).name.split('.')[0]
         ext = pred_file.split('.')[-1]
-        out_filename = 'yolo/{}.{}'.format(raw_name, ext)
+        out_filename = self.YOLO_UPLOAD + '{}.{}'.format(raw_name, ext)
 
         with open(pred_file, 'rb') as fd:
             self.yolo_image.name = out_filename
