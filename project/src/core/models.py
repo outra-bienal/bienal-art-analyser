@@ -45,7 +45,7 @@ class AnalysedImage(models.Model):
             self.ibm_watson_result,
             self.google_vision_result,
             self.azure_vision_result,
-            #self.yolo_image,
+            self.yolo_image,
         ])
 
     def enqueue_analysis(self):
@@ -56,7 +56,7 @@ class AnalysedImage(models.Model):
             'ibm_watson_result': (tasks.ibm_analyse_image_task, 'ibm_watson_job_id'),
             'google_vision_result': (tasks.google_analyse_image_task, 'google_vision_job_id'),
             'azure_vision_result': (tasks.azure_analyse_image_task, 'azure_vision_job_id'),
-            #'yolo_image': (tasks.yolo_detect_image_task, 'yolo_job_id'),
+            'yolo_image': (tasks.yolo_detect_image_task, 'yolo_job_id'),
         }
 
         update_fields = []
