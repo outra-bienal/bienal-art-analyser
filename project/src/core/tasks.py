@@ -95,12 +95,8 @@ def yolo_detect_image_task(analysed_image_id):
     )
     detect.wait()
 
-    out_filename = '{}.png'.format(clean_filename)
-    with open(pred_file, 'rb') as fd:
-        db_image.yolo_image.name = out_filename
-        with db_image.yolo_image.open('wb') as out:
-            out.write(fd.read())
-        db_image.save()
+    db_image.write_yolo_file(pred_file)
+    db_image.save()
 
     temp_file.remove()
     pred_file.remove()

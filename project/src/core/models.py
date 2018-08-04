@@ -69,6 +69,17 @@ class AnalysedImage(models.Model):
 
         self.save(update_fields=update_fields)
 
+    def write_yolo_file(self, pred_file):
+        """pred_file must ben unipath.Path object"""
+        raw_name = self.image.name.split('/')[-1].split('.')[0]
+        ext = pred_file.split('.')[-1]
+        out_filename = 'yolo/{}.{}'.format(raw_name, ext)
+
+        with open(pred_file, 'rb') as fd:
+            self.yolo_image.name = out_filename
+            with self.yolo_image.open('wb') as out:
+                out.write(fd.read())
+
     class Meta:
         verbose_name = _('Análise de Imagem')
         verbose_name_plural = _('Análise de Imagem')
