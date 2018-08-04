@@ -8,7 +8,6 @@ from django.conf import settings
 from src.core.models import Collection, AnalysedImage
 
 
-
 class Command(BaseCommand):
     help = _('Cria coleção e faz upload de arquivos no diretório')
 
@@ -18,7 +17,9 @@ class Command(BaseCommand):
             type=str,
             help=_('Título da coleção a ser criada.')
         )
-        help=_('Nome (relatavio a {}) da coleção a ser criada.').format(settings.LOAD_COLLECTIONS_DIR)
+        help = _(
+            'Nome (relatavio a {}) da coleção a ser criada.'.format(settings.LOAD_COLLECTIONS_DIR)
+        )
         parser.add_argument(
             'nome_diretorio_imagens',
             type=str,
