@@ -12,7 +12,7 @@ DEBUG = config('DEBUG', cast=bool)
 SECRET_KEY = config('SECRET_KEY')
 PRODUCTION = config('PRODUCTION', default=False)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [config('APP_HOST', default='')]
 CORS_ORIGIN_ALLOW_ALL = True
 
 
@@ -138,9 +138,9 @@ AZURE_VISION_API_KEY = config('AZURE_VISION_API_KEY', default='missing_key')
 
 #YOLO config
 DARKNET_DIR = config('DARKNET_DIR', cast=Path)
-DARKNET_BIN = config('DARKNET_BIN')
-YOLO_CONF = config('YOLO_CONF')
-YOLO_WEIGHTS = config('YOLO_WEIGHTS')
+DARKNET_BIN = config('DARKNET_BIN', default=DARKNET_DIR.child('darknet'))
+YOLO_CONF = config('YOLO_CONF', default=DARKNET_DIR.child('cfg', 'yolov3.cfg'))
+YOLO_WEIGHTS = config('YOLO_WEIGHTS', default=DARKNET_DIR.child('yolov3.weights'))
 
 import django_heroku
 django_heroku.settings(locals())
