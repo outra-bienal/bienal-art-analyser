@@ -1,6 +1,7 @@
 import subprocess
 from unipath import Path
 from urllib.parse import urlparse
+import shlex
 
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -75,7 +76,7 @@ def yolo_detect_image_task(analysed_image_id):
         fd.write(db_image.image.read())
 
     pred_file = Path(settings.DARKNET_DIR, 'pred-{}.png'.format(clean_filename))
-    detect_command = [
+    command = ' '.join([
         settings.DARKNET_BIN,
         'detect',
         settings.YOLO_CONF,
@@ -83,12 +84,11 @@ def yolo_detect_image_task(analysed_image_id):
         temp_file,
         '-out',
         pred_file.name.split('.')[0],
-
-    ]
-    print('Exec --> {}'.format(' '.join(detect_command)))
+    ])
+    print('Exec --> {}'.format(command))
 
     detect = subprocess.Popen(
-        detect_command,
+        shlex.split(command),
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         cwd=settings.DARKNET_DIR,
