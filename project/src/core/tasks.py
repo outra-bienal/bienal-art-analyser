@@ -70,7 +70,7 @@ def yolo_detect_image_task(analysed_image_id):
 
     filename = db_image.image.name.split('/')[-1]
     clean_filename = filename.split('.')[0]
-    temp_file = Path('/', 'tmp', filename)
+    temp_file = settings.TEMP_DIR.child(filename)
 
     with open(temp_file, 'bw') as fd:
         fd.write(db_image.image.read())

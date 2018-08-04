@@ -144,6 +144,7 @@ YOLO_WEIGHTS = config('YOLO_WEIGHTS', default=DARKNET_DIR.child('yolov3.weights'
 
 #APP config
 LOAD_COLLECTIONS_DIR = config('LOAD_COLLECTIONS_DIR', default='/tmp/', cast=Path)
+TEMP_DIR = LOAD_COLLECTIONS_DIR
 
 import django_heroku
 django_heroku.settings(locals())
