@@ -83,7 +83,10 @@ class AnalysedImage(models.Model):
 
     def write_yolo_file(self, pred_file):
         """pred_file must ben unipath.Path object"""
-        raw_name = Path(self.image.path).name.split('.')[0]
+        try:
+            raw_name = Path(self.image.path).name.split('.')[0]
+        except NotImplementedError:
+            raw_name = Path(self.image.name).name.split('.')[0]
         ext = pred_file.split('.')[-1]
         out_filename = self.YOLO_UPLOAD + '{}.{}'.format(raw_name, ext)
 
