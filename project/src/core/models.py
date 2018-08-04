@@ -1,3 +1,5 @@
+from unipath import Path
+
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 from django.utils.translation import gettext as _
@@ -70,6 +72,14 @@ class AnalysedImage(models.Model):
                 update_fields.append(job_id_field)
 
         self.save(update_fields=update_fields)
+
+    def write_image_field(self, image_file):
+        """image_file must ben unipath.Path object"""
+        name = image_file.name
+        with open(image_file, 'rb') as fd:
+            self.image.name = self.BASE_UPLOAD + name
+            with self.image.open('wb') as out:
+                out.write(fd.read())
 
     def write_yolo_file(self, pred_file):
         """pred_file must ben unipath.Path object"""
