@@ -1,4 +1,4 @@
-Projeto para as análises de imagens para a 33ª Bienal de São Paulo
+Projeto para as análises de imagens para o projeto (OUTRA) 33ª Bienal de São Paulo
 
 ## Setup da aplicação
 
