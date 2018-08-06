@@ -1,3 +1,5 @@
+from unipath import Path
+
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 from django.utils.translation import gettext as _
@@ -25,7 +27,9 @@ class Collection(models.Model):
 
 
 class AnalysedImage(models.Model):
-    image = models.ImageField(upload_to='base/', verbose_name=_('Imagem'))
+    BASE_UPLOAD, YOLO_UPLOAD = 'base/', 'yolo/'
+
+    image = models.ImageField(upload_to=BASE_UPLOAD, verbose_name=_('Imagem'))
     recokgnition_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
     recokgnition_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Id job de análise'))
     ibm_watson_result = JSONField(default={}, blank=True, verbose_name=_('IBM Watson'))
@@ -35,7 +39,7 @@ class AnalysedImage(models.Model):
     azure_vision_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
     azure_vision_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Azure Job'))
     collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
-    yolo_image = models.ImageField(upload_to='yolo/', verbose_name=_('Output YOLO'))
+    yolo_image = models.ImageField(upload_to=YOLO_UPLOAD, verbose_name=_('Output YOLO'))
     yolo_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Yolo Job'))
 
     @property
@@ -68,6 +72,28 @@ class AnalysedImage(models.Model):
                 update_fields.append(job_id_field)
 
         self.save(update_fields=update_fields)
+
+    def write_image_field(self, image_file):
+        """image_file must ben unipath.Path object"""
+        name = image_file.name
+        with open(image_file, 'rb') as fd:
+            self.image.name = self.BASE_UPLOAD + name
+            with self.image.open('wb') as out:
+                out.write(fd.read())
+
+    def write_yolo_file(self, pred_file):
+        """pred_file must ben unipath.Path object"""
+        try:
+            raw_name = Path(self.image.path).name.split('.')[0]
+        except NotImplementedError:
+            raw_name = Path(self.image.name).name.split('.')[0]
+        ext = pred_file.split('.')[-1]
+        out_filename = self.YOLO_UPLOAD + '{}.{}'.format(raw_name, ext)
+
+        with open(pred_file, 'rb') as fd:
+            self.yolo_image.name = out_filename
+            with self.yolo_image.open('wb') as out:
+                out.write(fd.read())
 
     class Meta:
         verbose_name = _('Análise de Imagem')

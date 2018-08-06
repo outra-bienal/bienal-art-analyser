@@ -70,7 +70,7 @@ def yolo_detect_image_task(analysed_image_id):
 
     filename = db_image.image.name.split('/')[-1]
     clean_filename = filename.split('.')[0]
-    temp_file = Path('/', 'tmp', filename)
+    temp_file = settings.TEMP_DIR.child(filename)
 
     with open(temp_file, 'bw') as fd:
         fd.write(db_image.image.read())
@@ -89,18 +89,14 @@ def yolo_detect_image_task(analysed_image_id):
 
     detect = subprocess.Popen(
         shlex.split(command),
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        #stdout=subprocess.DEVNULL,
+        #stderr=subprocess.DEVNULL,
         cwd=settings.DARKNET_DIR,
     )
     detect.wait()
 
-    out_filename = '{}.png'.format(clean_filename)
-    with open(pred_file, 'rb') as fd:
-        db_image.yolo_image.name = out_filename
-        with db_image.yolo_image.open('wb') as out:
-            out.write(fd.read())
-        db_image.save()
+    db_image.write_yolo_file(pred_file)
+    db_image.save()
 
     temp_file.remove()
     pred_file.remove()
