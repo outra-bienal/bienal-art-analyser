@@ -98,3 +98,4 @@ class AnalysedImage(models.Model):
     class Meta:
         verbose_name = _('Análise de Imagem')
         verbose_name_plural = _('Análise de Imagem')
+        ordering = ['image']
