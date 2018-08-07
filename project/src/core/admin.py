@@ -25,6 +25,7 @@ class AnalysedImageInline(admin.TabularInline):
     extra = 5
     suit_classes = 'suit-tab suit-tab-images'
     fields = ['image', 'collection']
+    max_num = 100
 
 
 class CollectionAdmin(admin.ModelAdmin):
