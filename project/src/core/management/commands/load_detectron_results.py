@@ -25,8 +25,7 @@ class Command(BaseCommand):
         print("Atualizando imagens da análise do Detectron...")
         for image_file in tqdm(images_dir.listdir()):
             f_name = image_file.name.split('.')[0]
-            image_prefix = "{}/{}".format(AnalysedImage.BASE_UPLOAD, f_name)
+            image_prefix = "{}{}.".format(AnalysedImage.BASE_UPLOAD, f_name)
             image = AnalysedImage.objects.get(image__startswith=image_prefix)
             image.write_detectron_field(image_file)
             image.save()
-
