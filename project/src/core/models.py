@@ -27,7 +27,7 @@ class Collection(models.Model):
 
 
 class AnalysedImage(models.Model):
-    BASE_UPLOAD, YOLO_UPLOAD = 'base/', 'yolo/'
+    BASE_UPLOAD, YOLO_UPLOAD, DETECTRON_UPLOAD = 'base/', 'yolo/', 'detectron/'
 
     image = models.ImageField(upload_to=BASE_UPLOAD, verbose_name=_('Imagem'))
     recokgnition_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
@@ -41,6 +41,7 @@ class AnalysedImage(models.Model):
     collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
     yolo_image = models.ImageField(upload_to=YOLO_UPLOAD, verbose_name=_('Output YOLO'))
     yolo_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Yolo Job'))
+    detectron_image = models.ImageField(upload_to=DETECTRON_UPLOAD, verbose_name=_('Output Detectron'), null=True)
 
     @property
     def processed(self):
@@ -93,6 +94,14 @@ class AnalysedImage(models.Model):
         with open(pred_file, 'rb') as fd:
             self.yolo_image.name = out_filename
             with self.yolo_image.open('wb') as out:
+                out.write(fd.read())
+
+    def write_detectron_field(self, image_file):
+        """image_file must ben unipath.Path object"""
+        name = image_file.name
+        with open(image_file, 'rb') as fd:
+            self.detectron_image.name = self.DETECTRON_UPLOAD + name
+            with self.detectron_image.open('wb') as out:
                 out.write(fd.read())
 
     class Meta:
