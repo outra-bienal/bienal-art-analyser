@@ -96,6 +96,14 @@ class AnalysedImage(models.Model):
             with self.yolo_image.open('wb') as out:
                 out.write(fd.read())
 
+    def write_detectron_field(self, image_file):
+        """image_file must ben unipath.Path object"""
+        name = image_file.name
+        with open(image_file, 'rb') as fd:
+            self.detectron_image.name = self.DETECTRON_UPLOAD + name
+            with self.detectron_image.open('wb') as out:
+                out.write(fd.read())
+
     class Meta:
         verbose_name = _('Análise de Imagem')
         verbose_name_plural = _('Análise de Imagem')
