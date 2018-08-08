@@ -67,8 +67,8 @@ class CollectionAdmin(admin.ModelAdmin):
 class AnalysedImageAdmin(admin.ModelAdmin):
     list_display = ['id', 'preview_list', 'processed', 'link_to_collection']
     list_filter = ['collection__title']
-    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id', 'yolo_image', 'yolo_job_id']
-    readonly_fields = ['link_to_collection', 'preview', 'yolo', 'aws', 'ibm', 'google', 'azure']
+    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id', 'yolo_image', 'yolo_job_id', 'detectron_image']
+    readonly_fields = ['link_to_collection', 'preview', 'yolo', 'detectron', 'aws', 'ibm', 'google', 'azure']
 
     def has_add_permission(self, request):
         return False
@@ -90,6 +90,11 @@ class AnalysedImageAdmin(admin.ModelAdmin):
     def yolo(self, obj):
         if obj.yolo_image:
             return preview(obj.yolo_image.url, "50em")
+        return '---'
+
+    def detectron(self, obj):
+        if obj.detectron_image:
+            return preview(obj.detectron_image.url, "50em")
         return '---'
 
     def processed(self, obj):

@@ -16,7 +16,8 @@ class AnalysedImageSerializerTests(TestCase):
             ibm_watson_result={'ibm': 'data'},
             google_vision_result={'google': 'data'},
             azure_vision_result={'azure': 'data'},
-            _create_files=True
+            _create_files=True,
+            _fill_optional=True
         )
 
         serializer = AnalysedImageSerializer(instance=analysed_image)
@@ -28,6 +29,7 @@ class AnalysedImageSerializerTests(TestCase):
             'microsoftazure': {'azure': 'data'},
             'processed': analysed_image.processed,
             'yolo_image': analysed_image.yolo_image.url,
+            'detectron_image': analysed_image.detectron_image.url,
         }
 
         assert expected == serializer.data
