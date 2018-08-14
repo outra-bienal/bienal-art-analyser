@@ -8,7 +8,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from .sample_responses import *
-from src.core.analysers import aws_analyser, ibm_analyser, google_analyser, azure_analyser
+from src.core.analysers import aws_analyser, ibm_analyser, google_analyser, azure_analyser, deep_ai_analyser
 
 
 class TestAWSAnalyser(TestCase):
@@ -188,3 +188,43 @@ class TestAzureAnalyser(TestCase):
         data = azure_analyser(self.image_url)
 
         assert data is None
+
+
+class TestDeepAIAnalyser(TestCase):
+    image_url = 'https://bienal-image-analyser.s3.amazonaws.com/folder/img.jpg?X-Amz-Algorithm=AWS4-HMAC'
+
+    def setUp(self):
+        self.url = 'https://api.deepai.org/api/densecap'
+        self.headers = {'Api-Key': settings.DEEP_AI_API_KEY}
+
+    @responses.activate
+    def test_return_response_if_success(self):
+        responses.add(
+            responses.POST,
+            self.url,
+            json=DEEP_API_DENSE_CAP_RESPONSE,
+            status=200,
+            headers=self.headers,
+        )
+
+        data = deep_ai_analyser(self.image_url)
+        expected_data = urlencode({'image': self.image_url.split('?')[0]})
+        call = responses.calls[0]
+
+        assert expected_data == call.request.body
+        assert DEEP_API_DENSE_CAP_RESPONSE == data['DenseCap']
+
+#    @responses.activate
+#    def test_fails_silently_if_error(self):
+#        responses.add(
+#            responses.POST,
+#            self.url,
+#            json={'some': 'error'},
+#            status=400,
+#            match_querystring=True,
+#            headers=self.headers,
+#        )
+#
+#        data = azure_analyser(self.image_url)
+#
+#        assert data is None
