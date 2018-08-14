@@ -86,3 +86,13 @@ def azure_analyser(image_url):
 
     if response.ok:
         return {'main': response.json()}
+
+
+def deep_ai_analyser(image_url):
+    url = 'https://api.deepai.org/api/densecap'
+    headers = {'Api-Key': settings.DEEP_AI_API_KEY}
+
+    image_url = image_url.split('?')[0]
+    response = requests.post(url, headers=headers, data={'image': image_url})
+
+    return {'DenseCap': response.json()}

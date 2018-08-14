@@ -29,19 +29,26 @@ class Collection(models.Model):
 class AnalysedImage(models.Model):
     BASE_UPLOAD, YOLO_UPLOAD, DETECTRON_UPLOAD = 'base/', 'yolo/', 'detectron/'
 
+    collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
     image = models.ImageField(upload_to=BASE_UPLOAD, verbose_name=_('Imagem'))
     recokgnition_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
     recokgnition_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Id job de análise'))
     ibm_watson_result = JSONField(default={}, blank=True, verbose_name=_('IBM Watson'))
     ibm_watson_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('IBM Watson Job'))
+
     google_vision_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
     google_vision_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Google Job'))
+
     azure_vision_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
     azure_vision_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Azure Job'))
-    collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
+
+    deep_ai_result = JSONField(default={}, blank=True, verbose_name=_('Deep AI'))
+    deep_ai_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Deep AI Job'))
+
+    detectron_image = models.ImageField(upload_to=DETECTRON_UPLOAD, verbose_name=_('Output Detectron'), null=True)
+
     yolo_image = models.ImageField(upload_to=YOLO_UPLOAD, verbose_name=_('Output YOLO'))
     yolo_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Yolo Job'))
-    detectron_image = models.ImageField(upload_to=DETECTRON_UPLOAD, verbose_name=_('Output Detectron'), null=True)
 
     @property
     def processed(self):
@@ -50,6 +57,7 @@ class AnalysedImage(models.Model):
             self.ibm_watson_result,
             self.google_vision_result,
             self.azure_vision_result,
+            self.deep_ai_result,
             self.yolo_image,
         ])
 
@@ -61,6 +69,7 @@ class AnalysedImage(models.Model):
             'ibm_watson_result': (tasks.ibm_analyse_image_task, 'ibm_watson_job_id'),
             'google_vision_result': (tasks.google_analyse_image_task, 'google_vision_job_id'),
             'azure_vision_result': (tasks.azure_analyse_image_task, 'azure_vision_job_id'),
+            'deep_ai_result': (tasks.deep_ai_analyse_image_task, 'deep_ai_job_id'),
             'yolo_image': (tasks.yolo_detect_image_task, 'yolo_job_id'),
         }
 
