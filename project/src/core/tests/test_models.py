@@ -17,6 +17,7 @@ class AnalysedImageModelTests(TestCase):
             ibm_watson_result={'fake': 'data'},
             google_vision_result={'fake': 'data'},
             azure_vision_result={'fake': 'data'},
+            deep_ai_result={'fake': 'data'},
             _create_files=True,
         )
 
@@ -24,6 +25,8 @@ class AnalysedImageModelTests(TestCase):
         self.analysed_image.image.delete()
         if self.analysed_image.yolo_image:
             self.analysed_image.yolo_image.delete()
+        if self.analysed_image.detectron_image:
+            self.analysed_image.detectron_image.delete()
 
     @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
     def test_do_not_enqueue_if_data(self):
@@ -90,6 +93,20 @@ class AnalysedImageModelTests(TestCase):
         self.analysed_image.azure_vision_job_id = '42'
 
     @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
+    def test_enqueue_deep_ai_analysis(self):
+        self.analysed_image.deep_ai_result = {}
+        self.analysed_image.save()
+        client = RedisAsyncClient()
+
+        self.analysed_image.enqueue_analysis()
+        self.analysed_image.refresh_from_db()
+
+        client.enqueue_default.assert_called_once_with(
+            tasks.deep_ai_analyse_image_task, self.analysed_image.id
+        )
+        self.analysed_image.deep_ai_job_id = '42'
+
+    @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
     def test_enqueue_yolo_detection(self):
         self.analysed_image.yolo_image.delete()
         self.analysed_image.save()
@@ -117,5 +134,8 @@ class AnalysedImageModelTests(TestCase):
         self.analysed_image.azure_vision_result = {}
         assert self.analysed_image.processed is False
         self.analysed_image.azure_vision_result = {'foo': 'bar'}
+        self.analysed_image.deep_ai_result = {}
+        assert self.analysed_image.processed is False
+        self.analysed_image.deep_ai_result = {'foo': 'bar'}
         self.analysed_image.yolo_image.delete()
         assert self.analysed_image.processed is False
