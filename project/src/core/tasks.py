@@ -61,6 +61,19 @@ def azure_analyse_image_task(analysed_image_id):
         db_image.save(update_fields=['azure_vision_result'])
 
 
+def deep_ai_analyse_image_task(analysed_image_id):
+    from src.core.models import AnalysedImage
+    try:
+        db_image = AnalysedImage.objects.get(id=analysed_image_id)
+    except AnalysedImage.DoesNotExist:
+        return None
+
+    result = analysers.deep_ai_analyser(db_image.image.url)
+    if result:
+        db_image.deep_ai_result = result
+        db_image.save(update_fields=['deep_ai_result'])
+
+
 def yolo_detect_image_task(analysed_image_id):
     from src.core.models import AnalysedImage
     try:
