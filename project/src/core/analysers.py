@@ -96,7 +96,8 @@ def deep_ai_analyser(image_url):
     image_url = image_url.split('?')[0]
     response = requests.post(url, headers=headers, data={'image': image_url})
 
-    return {'DenseCap': response.json()}
+    if response.ok:
+        return {'DenseCap': response.json()}
 
 
 def clarifai_analyser(image_url):
