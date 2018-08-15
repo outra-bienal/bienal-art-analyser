@@ -61,3 +61,4 @@ Como a parte de processamento das imagens é assíncrona, é necessário deixarm
 ```bash
 python project/manage.py rqworker
 ```
+
