@@ -4,6 +4,7 @@ import json
 import boto3
 import requests
 from watson_developer_cloud import VisualRecognitionV3
+from clarifai.rest import ClarifaiApp
 
 from django.conf import settings
 
@@ -86,3 +87,33 @@ def azure_analyser(image_url):
 
     if response.ok:
         return {'main': response.json()}
+
+
+def deep_ai_analyser(image_url):
+    url = 'https://api.deepai.org/api/densecap'
+    headers = {'Api-Key': settings.DEEP_AI_API_KEY}
+
+    image_url = image_url.split('?')[0]
+    response = requests.post(url, headers=headers, data={'image': image_url})
+
+    if response.ok:
+        return {'DenseCap': response.json()}
+
+
+def clarifai_analyser(image_url):
+    image_url = image_url.split('?')[0]
+    clarifai = ClarifaiApp(api_key=settings.CLARIFAI_API_KEY)
+
+    celebrity_model = clarifai.models.get('celeb-v1.3')
+    demographics_model = clarifai.models.get('demographics')
+    general_model = clarifai.models.get('general-v1.3')
+    moderation_model = clarifai.models.get('moderation')
+    nsfw_model = clarifai.models.get('nsfw-v1.0')
+
+    return {
+        'celebrities': celebrity_model.predict_by_url(image_url)['outputs'][0]['data'],
+        'demographics': demographics_model.predict_by_url(image_url)['outputs'][0]['data'],
+        'general': general_model.predict_by_url(image_url)['outputs'][0]['data'],
+        'moderation': moderation_model.predict_by_url(image_url)['outputs'][0]['data'],
+        'nsfw': nsfw_model.predict_by_url(image_url)['outputs'][0]['data'],
+    }

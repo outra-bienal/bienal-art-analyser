@@ -36,6 +36,8 @@ class AnalysedImageSerializer(serializers.ModelSerializer):
     ibmwatson = serializers.SerializerMethodField()
     googlecloud = serializers.SerializerMethodField()
     microsoftazure = serializers.SerializerMethodField()
+    deepAi = serializers.SerializerMethodField()
+    clarifai = serializers.SerializerMethodField()
 
     def get_amazonRekog(self, analysed_image):
         return analysed_image.recokgnition_result
@@ -49,6 +51,12 @@ class AnalysedImageSerializer(serializers.ModelSerializer):
     def get_microsoftazure(self, analysed_image):
         return analysed_image.azure_vision_result
 
+    def get_deepAi(self, analysed_image):
+        return analysed_image.deep_ai_result
+
+    def get_clarifai(self, analysed_image):
+        return analysed_image.clarifai_result
+
     class Meta:
         model = AnalysedImage
-        fields = ['image', 'processed', 'amazonRekog', 'ibmwatson', 'googlecloud', 'microsoftazure', 'yolo_image']
+        fields = ['image', 'processed', 'amazonRekog', 'ibmwatson', 'googlecloud', 'microsoftazure', 'yolo_image', 'detectron_image', 'deepAi', 'clarifai']

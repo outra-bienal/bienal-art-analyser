@@ -25,6 +25,7 @@ class AnalysedImageInline(admin.TabularInline):
     extra = 5
     suit_classes = 'suit-tab suit-tab-images'
     fields = ['image', 'collection']
+    max_num = 100
 
 
 class CollectionAdmin(admin.ModelAdmin):
@@ -66,8 +67,8 @@ class CollectionAdmin(admin.ModelAdmin):
 class AnalysedImageAdmin(admin.ModelAdmin):
     list_display = ['id', 'preview_list', 'processed', 'link_to_collection']
     list_filter = ['collection__title']
-    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id', 'yolo_image', 'yolo_job_id']
-    readonly_fields = ['link_to_collection', 'preview', 'yolo', 'aws', 'ibm', 'google', 'azure']
+    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'deep_ai_result', 'deep_ai_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id', 'yolo_image', 'yolo_job_id', 'detectron_image', 'clarifai_result', 'clarifai_job_id']
+    readonly_fields = ['link_to_collection', 'preview', 'yolo', 'detectron', 'aws', 'ibm', 'google', 'azure', 'deep_ai', 'clarifai']
 
     def has_add_permission(self, request):
         return False
@@ -89,6 +90,11 @@ class AnalysedImageAdmin(admin.ModelAdmin):
     def yolo(self, obj):
         if obj.yolo_image:
             return preview(obj.yolo_image.url, "50em")
+        return '---'
+
+    def detectron(self, obj):
+        if obj.detectron_image:
+            return preview(obj.detectron_image.url, "50em")
         return '---'
 
     def processed(self, obj):
@@ -119,6 +125,14 @@ class AnalysedImageAdmin(admin.ModelAdmin):
     def azure(self, obj):
         return self._display_result(obj.azure_vision_result)
     azure.short_description = _('Azure Computer Vision')
+
+    def deep_ai(self, obj):
+        return self._display_result(obj.deep_ai_result)
+    deep_ai.short_description = _('Deep AI')
+
+    def clarifai(self, obj):
+        return self._display_result(obj.clarifai_result)
+    clarifai.short_description = _('Clarifai')
 
 
 admin.site.register(Collection, CollectionAdmin)
