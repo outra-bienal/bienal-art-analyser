@@ -45,6 +45,9 @@ class AnalysedImage(models.Model):
     deep_ai_result = JSONField(default={}, blank=True, verbose_name=_('Deep AI'))
     deep_ai_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Deep AI Job'))
 
+    clarifai_result = JSONField(default={}, blank=True, verbose_name=_('Clarifai'))
+    clarifai_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Clarifai Job'))
+
     detectron_image = models.ImageField(upload_to=DETECTRON_UPLOAD, verbose_name=_('Output Detectron'), null=True)
 
     yolo_image = models.ImageField(upload_to=YOLO_UPLOAD, verbose_name=_('Output YOLO'))
