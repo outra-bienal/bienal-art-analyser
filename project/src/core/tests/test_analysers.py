@@ -3,6 +3,7 @@ import json
 import responses
 from unittest.mock import Mock, patch
 from watson_developer_cloud import VisualRecognitionV3
+from clarifai.rest import ClarifaiApp
 
 from django.conf import settings
 from django.test import TestCase
@@ -214,17 +215,16 @@ class TestDeepAIAnalyser(TestCase):
         assert expected_data == call.request.body
         assert DEEP_API_DENSE_CAP_RESPONSE == data['DenseCap']
 
-#    @responses.activate
-#    def test_fails_silently_if_error(self):
-#        responses.add(
-#            responses.POST,
-#            self.url,
-#            json={'some': 'error'},
-#            status=400,
-#            match_querystring=True,
-#            headers=self.headers,
-#        )
-#
-#        data = azure_analyser(self.image_url)
-#
-#        assert data is None
+    @responses.activate
+    def test_fails_silently_if_error(self):
+        responses.add(
+            responses.POST,
+            self.url,
+            json={'some': 'error'},
+            status=400,
+            headers=self.headers,
+        )
+
+        data = deep_ai_analyser(self.image_url)
+
+        assert data is None

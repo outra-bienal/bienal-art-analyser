@@ -136,6 +136,7 @@ IBM_IAM_API_KEY = config('IBM_IAM_API_KEY', default='missing_key')
 GOOGLE_VISION_API_KEY = config('GOOGLE_VISION_API_KEY', default='missing_key')
 AZURE_VISION_API_KEY = config('AZURE_VISION_API_KEY', default='missing_key')
 DEEP_AI_API_KEY = config('DEEP_AI_API_KEY', default='missing_key')
+CLARIFAI_API_KEY = config('CLARIFAI_API_KEY', default='missing_key')
 
 #YOLO config
 DARKNET_DIR = config('DARKNET_DIR', cast=Path)

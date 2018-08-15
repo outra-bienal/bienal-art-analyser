@@ -19,3 +19,4 @@ django-cors-headers==2.4.0
 watson-developer-cloud==1.5.0
 requests==2.19.1
 tqdm==4.24.0
+clarifai==2.2.3

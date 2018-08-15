@@ -17,6 +17,7 @@ class AnalysedImageSerializerTests(TestCase):
             google_vision_result={'google': 'data'},
             azure_vision_result={'azure': 'data'},
             deep_ai_result={'deep_ai': 'data'},
+            clarifai_result={'clarifai': 'data'},
             _create_files=True,
             _fill_optional=True
         )
@@ -29,6 +30,7 @@ class AnalysedImageSerializerTests(TestCase):
             'googlecloud': {'google': 'data'},
             'microsoftazure': {'azure': 'data'},
             'deepAi': {'deep_ai': 'data'},
+            'clarifai': {'clarifai': 'data'},
             'processed': analysed_image.processed,
             'yolo_image': analysed_image.yolo_image.url,
             'detectron_image': analysed_image.detectron_image.url,
