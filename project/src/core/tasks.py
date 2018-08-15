@@ -74,6 +74,19 @@ def deep_ai_analyse_image_task(analysed_image_id):
         db_image.save(update_fields=['deep_ai_result'])
 
 
+def clarifai_analyse_image_task(analysed_image_id):
+    from src.core.models import AnalysedImage
+    try:
+        db_image = AnalysedImage.objects.get(id=analysed_image_id)
+    except AnalysedImage.DoesNotExist:
+        return None
+
+    result = analysers.clarifai_analyser(db_image.image.url)
+    if result:
+        db_image.clarifai_result = result
+        db_image.save(update_fields=['clarifai_result'])
+
+
 def yolo_detect_image_task(analysed_image_id):
     from src.core.models import AnalysedImage
     try:
