@@ -17,8 +17,8 @@ def get_caption_positions(caption):
     box = caption['bounding_box']
     top = int(box[0]) + PADDING_TOP
     left = int(box[1]) + PADDING_LEFT
-    bottom = int(top + box[2])
-    right = int(left + box[3])
+    right = int(left + box[2])
+    bottom = int(top + box[3])
     return (top, left), (bottom, right)
 
 
