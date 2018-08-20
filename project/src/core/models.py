@@ -27,7 +27,10 @@ class Collection(models.Model):
 
 
 class AnalysedImage(models.Model):
-    BASE_UPLOAD, YOLO_UPLOAD, DETECTRON_UPLOAD = 'base/', 'yolo/', 'detectron/'
+    BASE_UPLOAD = 'base/'
+    YOLO_UPLOAD = 'yolo/'
+    DETECTRON_UPLOAD = 'detectron/'
+    DENSE_CAP_UPLOAD = 'dense_cap/'
 
     collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
     image = models.ImageField(upload_to=BASE_UPLOAD, verbose_name=_('Imagem'))
@@ -52,6 +55,10 @@ class AnalysedImage(models.Model):
 
     yolo_image = models.ImageField(upload_to=YOLO_UPLOAD, verbose_name=_('Output YOLO'))
     yolo_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Yolo Job'))
+
+    dense_cap_image = models.ImageField(upload_to=DENSE_CAP_UPLOAD, verbose_name=('Output Dense Cap (10 results)'), null=True)
+    dense_cap_full_image = models.ImageField(upload_to=DENSE_CAP_UPLOAD, verbose_name=('Output Dense Cap (all results)'), null=True)
+    dense_cap_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Dense Cap Job'))
 
     @property
     def processed(self):
