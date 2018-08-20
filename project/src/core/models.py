@@ -17,6 +17,11 @@ class Collection(models.Model):
             if not image.processed:
                 image.enqueue_analysis()
 
+    def generate_dense_cap_images(self):
+        for image in self.analysed_images.all():
+            if not image.processed:
+                image.enqueue_dense_cap_image()
+
     @property
     def processed(self):
         return all([i.processed for i in self.analysed_images.all()])
@@ -94,6 +99,15 @@ class AnalysedImage(models.Model):
                 update_fields.append(job_id_field)
 
         self.save(update_fields=update_fields)
+
+    def enqueue_dense_cap_image(self):
+        if 'DenseCap' not in self.deep_ai_result:
+            return
+
+        client = RedisAsyncClient()
+        job = client.enqueue_default(tasks.generate_dense_cap_image_task, self.id)
+        self.dense_cap_job_id = str(job.id)
+        self.save(update_fields=['dense_cap_job_id'])
 
     def write_image_field(self, image_file):
         """image_file must ben unipath.Path object"""

@@ -32,7 +32,7 @@ class CollectionAdmin(admin.ModelAdmin):
     suit_form_tabs = (('colecao', _('Coleção')), ('images', _('Imagens')))
     list_display = ['title', 'date', 'processed', 'link_to_images']
     inlines = [AnalysedImageInline]
-    actions = ['run_analysis']
+    actions = ['run_analysis', 'generate_dense_cap_images']
     fieldsets = (
         (None, {
             'fields': ('title', 'date'),
@@ -62,6 +62,13 @@ class CollectionAdmin(admin.ModelAdmin):
         msg = "{} coleções foram enfileiradas para serem analisadas.".format(queryset.count())
         self.message_user(request, msg, messages.SUCCESS)
     run_analysis.short_description = _('Roda AI nas imagens da coleção')
+
+    def generate_dense_cap_images(self, request, queryset):
+        for collection in queryset.all():
+            collection.generate_dense_cap_images()
+        msg = "Gerando imagens de DenseCap para {} coleções.".format(queryset.count())
+        self.message_user(request, msg, messages.SUCCESS)
+    generate_dense_cap_images.short_description = _('Gerar imagens do DenseCap')
 
 
 class AnalysedImageAdmin(admin.ModelAdmin):
