@@ -125,6 +125,23 @@ class AnalysedImage(models.Model):
             with self.detectron_image.open('wb') as out:
                 out.write(fd.read())
 
+    def write_dense_cap_image(self, image_file):
+        """image_file must ben unipath.Path object"""
+        name = image_file.name
+        with open(image_file, 'rb') as fd:
+            self.dense_cap_image.name = self.DENSE_CAP_UPLOAD + name
+            with self.dense_cap_image.open('wb') as out:
+                out.write(fd.read())
+
+    def write_dense_cap_full_image(self, image_file):
+        """image_file must ben unipath.Path object"""
+        name = image_file.name
+        with open(image_file, 'rb') as fd:
+            name = 'full_' + name
+            self.dense_cap_full_image.name = self.DENSE_CAP_UPLOAD + name
+            with self.dense_cap_full_image.open('wb') as out:
+                out.write(fd.read())
+
     class Meta:
         verbose_name = _('Análise de Imagem')
         verbose_name_plural = _('Análise de Imagem')

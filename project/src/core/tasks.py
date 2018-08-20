@@ -1,12 +1,14 @@
+import cv2
+import shlex
 import subprocess
 from unipath import Path
 from urllib.parse import urlparse
-import shlex
 
 from django.conf import settings
 from django.core.files.storage import default_storage
 
 from src.core import analysers
+from src.core import tag_image
 
 
 def aws_analyse_image_task(analysed_image_id):
@@ -127,3 +129,38 @@ def yolo_detect_image_task(analysed_image_id):
     temp_file.remove()
     pred_file.remove()
     print('Success!')
+
+
+def generate_dense_cap_image_task(analysed_image_id):
+    from src.core.models import AnalysedImage
+    try:
+        db_image = AnalysedImage.objects.get(id=analysed_image_id)
+    except AnalysedImage.DoesNotExist:
+        return None
+
+    filename = db_image.image.name.split('/')[-1]
+    temp_file = settings.TEMP_DIR.child(filename)
+
+    with open(temp_file, 'bw') as fd:
+        fd.write(db_image.image.read())
+
+    captions = db_image.deep_ai_result['DenseCap']['output']['captions']
+    all_img = tag_image.prepare_image(cv2.imread(temp_file))
+    limited_img = tag_image.prepare_image(cv2.imread(temp_file))
+    for i, caption in enumerate(captions):
+        label = caption['caption']
+        p1, p2 = tag_image.get_caption_positions(caption)
+        all_img = tag_image.tag_element(all_img, p1, p2, label)
+        if i < 10:
+            limited_img = tag_image.tag_element(limited_img, p1, p2, label)
+
+    # image with all captions
+    cv2.imwrite(temp_file, all_img)
+    db_image.write_dense_cap_full_image(temp_file)
+
+    # image with 10 captions
+    cv2.imwrite(temp_file, limited_img)
+    db_image.write_dense_cap_image(temp_file)
+
+    db_image.save()
+    temp_file.remove()
