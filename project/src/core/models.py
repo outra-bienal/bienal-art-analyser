@@ -19,8 +19,7 @@ class Collection(models.Model):
 
     def generate_dense_cap_images(self):
         for image in self.analysed_images.all():
-            if not image.processed:
-                image.enqueue_dense_cap_image()
+            image.enqueue_dense_cap_image()
 
     @property
     def processed(self):
