@@ -68,15 +68,3 @@ def tag_element(img, p1, p2, tag):
     cv2.putText(img, tag, text_p, font_face, scale, BLACK, thickness, baseline)
 
     return img
-
-
-def prepare_image(img):
-    return cv2.copyMakeBorder(
-        img,
-        PADDING_TOP,
-        PADDING_BOTTOM,
-        PADDING_LEFT,
-        PADDING_RIGHT,
-        cv2.BORDER_CONSTANT,
-        value=BLACK
-    )

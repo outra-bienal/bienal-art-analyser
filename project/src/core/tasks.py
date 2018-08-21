@@ -145,8 +145,8 @@ def generate_dense_cap_image_task(analysed_image_id):
         fd.write(db_image.image.read())
 
     captions = db_image.deep_ai_result['DenseCap']['output']['captions']
-    all_img = tag_image.prepare_image(cv2.imread(temp_file))
-    limited_img = tag_image.prepare_image(cv2.imread(temp_file))
+    all_img = cv2.imread(temp_file))
+    limited_img = cv2.imread(temp_file))
     for i, caption in enumerate(captions):
         label = caption['caption']
         p1, p2 = tag_image.get_caption_positions(all_img, caption)
