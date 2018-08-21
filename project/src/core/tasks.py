@@ -149,7 +149,7 @@ def generate_dense_cap_image_task(analysed_image_id):
     limited_img = tag_image.prepare_image(cv2.imread(temp_file))
     for i, caption in enumerate(captions):
         label = caption['caption']
-        p1, p2 = tag_image.get_caption_positions(caption)
+        p1, p2 = tag_image.get_caption_positions(all_img, caption)
         all_img = tag_image.tag_element(all_img, p1, p2, label)
         if i < 10:
             limited_img = tag_image.tag_element(limited_img, p1, p2, label)
