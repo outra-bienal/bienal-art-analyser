@@ -96,7 +96,7 @@ def deep_ai_analyser(image_url):
     image_url = image_url.split('?')[0]
     response = requests.post(url, headers=headers, data={'image': image_url})
 
-    if response.ok:
+    if response.ok and 'err' not in response.json():
         return {'DenseCap': response.json()}
 
 
