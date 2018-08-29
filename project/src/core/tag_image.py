@@ -3,7 +3,7 @@ import random
 import wcag_contrast_ratio as contrast
 
 font_face = cv2.FONT_HERSHEY_SIMPLEX
-scale = 0.45
+scale = 0.9
 thickness = 1
 baseline = cv2.LINE_AA
 BLACK = (0, 0, 0)
@@ -53,13 +53,13 @@ def tag_element(img, p1, p2, tag):
 
     More here: https://stackoverflow.com/questions/23720875/how-to-draw-a-rectangle-around-a-region-of-interest-in-python
     """
-    text_p = (p1[0], p1[1] + 12)
+    text_p = (p1[0], p1[1] + 24)
 
     size = cv2.getTextSize(tag, font_face, scale, thickness)
-    label_background_start = (text_p[0], text_p[1] - 12)
+    label_background_start = (text_p[0], text_p[1] - 24)
     label_background_pos = (
         label_background_start[0] + size[0][0],
-        label_background_start[1] + size[0][1] + 8,
+        label_background_start[1] + size[0][1] + 16,
     )
 
     color = get_valid_color()
