@@ -139,6 +139,10 @@ def generate_dense_cap_image_task(analysed_image_id):
         return None
 
     filename = db_image.image.name.split('/')[-1]
+    splited = filename.split('.')
+    splited[-1] = 'png'
+    splited[-2] += '-{}'.format(analysed_image_id)
+    filename = '.'.join(splited)
     temp_file = settings.TEMP_DIR.child(filename)
 
     with open(temp_file, 'bw') as fd:
@@ -155,11 +159,15 @@ def generate_dense_cap_image_task(analysed_image_id):
             limited_img = tag_image.tag_element(limited_img, p1, p2, label)
 
     # image with all captions
-    cv2.imwrite(temp_file, all_img)
+    params = [
+        cv2.IMWRITE_PNG_COMPRESSION, 9,
+        cv2.IMWRITE_PNG_STRATEGY, 1,  # Z_FILTERED
+    ]
+    cv2.imwrite(temp_file, all_img, params)
     db_image.write_dense_cap_full_image(temp_file)
 
     # image with 10 captions
-    cv2.imwrite(temp_file, limited_img)
+    cv2.imwrite(temp_file, limited_img, params)
     db_image.write_dense_cap_image(temp_file)
 
     db_image.save()
