@@ -59,4 +59,4 @@ class AnalysedImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AnalysedImage
-        fields = ['image', 'processed', 'amazonRekog', 'ibmwatson', 'googlecloud', 'microsoftazure', 'yolo_image', 'detectron_image', 'deepAi', 'clarifai']
+        fields = ['image', 'processed', 'amazonRekog', 'ibmwatson', 'googlecloud', 'microsoftazure', 'yolo_image', 'detectron_image', 'deepAi', 'clarifai', 'dense_cap_image', 'dense_cap_full_image']

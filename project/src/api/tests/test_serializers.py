@@ -34,6 +34,8 @@ class AnalysedImageSerializerTests(TestCase):
             'processed': analysed_image.processed,
             'yolo_image': analysed_image.yolo_image.url,
             'detectron_image': analysed_image.detectron_image.url,
+            'dense_cap_image': analysed_image.dense_cap_image.url,
+            'dense_cap_full_image': analysed_image.dense_cap_full_image.url,
         }
 
         assert expected == serializer.data

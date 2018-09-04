@@ -17,6 +17,10 @@ class Collection(models.Model):
             if not image.processed:
                 image.enqueue_analysis()
 
+    def generate_dense_cap_images(self):
+        for image in self.analysed_images.all():
+            image.enqueue_dense_cap_image()
+
     @property
     def processed(self):
         return all([i.processed for i in self.analysed_images.all()])
@@ -27,7 +31,10 @@ class Collection(models.Model):
 
 
 class AnalysedImage(models.Model):
-    BASE_UPLOAD, YOLO_UPLOAD, DETECTRON_UPLOAD = 'base/', 'yolo/', 'detectron/'
+    BASE_UPLOAD = 'base/'
+    YOLO_UPLOAD = 'yolo/'
+    DETECTRON_UPLOAD = 'detectron/'
+    DENSE_CAP_UPLOAD = 'dense_cap/'
 
     collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
     image = models.ImageField(upload_to=BASE_UPLOAD, verbose_name=_('Imagem'))
@@ -52,6 +59,10 @@ class AnalysedImage(models.Model):
 
     yolo_image = models.ImageField(upload_to=YOLO_UPLOAD, verbose_name=_('Output YOLO'))
     yolo_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Yolo Job'))
+
+    dense_cap_image = models.ImageField(upload_to=DENSE_CAP_UPLOAD, verbose_name=('Output Dense Cap (10 results)'), null=True)
+    dense_cap_full_image = models.ImageField(upload_to=DENSE_CAP_UPLOAD, verbose_name=('Output Dense Cap (all results)'), null=True)
+    dense_cap_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Dense Cap Job'))
 
     @property
     def processed(self):
@@ -88,6 +99,15 @@ class AnalysedImage(models.Model):
 
         self.save(update_fields=update_fields)
 
+    def enqueue_dense_cap_image(self):
+        if 'DenseCap' not in self.deep_ai_result:
+            return
+
+        client = RedisAsyncClient()
+        job = client.enqueue_default(tasks.generate_dense_cap_image_task, self.id)
+        self.dense_cap_job_id = str(job.id)
+        self.save(update_fields=['dense_cap_job_id'])
+
     def write_image_field(self, image_file):
         """image_file must ben unipath.Path object"""
         name = image_file.name
@@ -116,6 +136,23 @@ class AnalysedImage(models.Model):
         with open(image_file, 'rb') as fd:
             self.detectron_image.name = self.DETECTRON_UPLOAD + name
             with self.detectron_image.open('wb') as out:
+                out.write(fd.read())
+
+    def write_dense_cap_image(self, image_file):
+        """image_file must ben unipath.Path object"""
+        name = image_file.name
+        with open(image_file, 'rb') as fd:
+            self.dense_cap_image.name = self.DENSE_CAP_UPLOAD + name
+            with self.dense_cap_image.open('wb') as out:
+                out.write(fd.read())
+
+    def write_dense_cap_full_image(self, image_file):
+        """image_file must ben unipath.Path object"""
+        name = image_file.name
+        with open(image_file, 'rb') as fd:
+            name = 'full_' + name
+            self.dense_cap_full_image.name = self.DENSE_CAP_UPLOAD + name
+            with self.dense_cap_full_image.open('wb') as out:
                 out.write(fd.read())
 
     class Meta:
