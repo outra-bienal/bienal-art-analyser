@@ -32,7 +32,7 @@ class CollectionAdmin(admin.ModelAdmin):
     suit_form_tabs = (('colecao', _('Coleção')), ('images', _('Imagens')))
     list_display = ['title', 'date', 'processed', 'link_to_images']
     inlines = [AnalysedImageInline]
-    actions = ['run_analysis']
+    actions = ['run_analysis', 'generate_dense_cap_images']
     fieldsets = (
         (None, {
             'fields': ('title', 'date'),
@@ -63,12 +63,19 @@ class CollectionAdmin(admin.ModelAdmin):
         self.message_user(request, msg, messages.SUCCESS)
     run_analysis.short_description = _('Roda AI nas imagens da coleção')
 
+    def generate_dense_cap_images(self, request, queryset):
+        for collection in queryset.all():
+            collection.generate_dense_cap_images()
+        msg = "Gerando imagens de DenseCap para {} coleções.".format(queryset.count())
+        self.message_user(request, msg, messages.SUCCESS)
+    generate_dense_cap_images.short_description = _('Gerar imagens do DenseCap')
+
 
 class AnalysedImageAdmin(admin.ModelAdmin):
     list_display = ['id', 'preview_list', 'processed', 'link_to_collection']
     list_filter = ['collection__title']
-    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'deep_ai_result', 'deep_ai_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id', 'yolo_image', 'yolo_job_id', 'detectron_image', 'clarifai_result', 'clarifai_job_id']
-    readonly_fields = ['link_to_collection', 'preview', 'yolo', 'detectron', 'aws', 'ibm', 'google', 'azure', 'deep_ai', 'clarifai']
+    exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'deep_ai_result', 'deep_ai_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id', 'yolo_image', 'yolo_job_id', 'detectron_image', 'clarifai_result', 'clarifai_job_id', 'dense_cap_job_id', 'dense_cap_image', 'dense_cap_full_image']
+    readonly_fields = ['link_to_collection', 'preview', 'yolo', 'detectron', 'dense_cap', 'dense_cap_full', 'aws', 'ibm', 'google', 'azure', 'deep_ai', 'clarifai']
 
     def has_add_permission(self, request):
         return False
@@ -90,6 +97,16 @@ class AnalysedImageAdmin(admin.ModelAdmin):
     def yolo(self, obj):
         if obj.yolo_image:
             return preview(obj.yolo_image.url, "50em")
+        return '---'
+
+    def dense_cap(self, obj):
+        if obj.dense_cap_image:
+            return preview(obj.dense_cap_image.url, "50em")
+        return '---'
+
+    def dense_cap_full(self, obj):
+        if obj.dense_cap_full_image:
+            return preview(obj.dense_cap_full_image.url, "50em")
         return '---'
 
     def detectron(self, obj):
