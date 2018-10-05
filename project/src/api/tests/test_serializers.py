@@ -1,6 +1,7 @@
 from model_mommy import mommy
 
 from django.test import TestCase
+from django.urls import reverse
 
 from .utils import formated_date
 from src.api.serializers import CollectionSerializer, AnalysedImageSerializer, CollectionDetailSerializer
@@ -24,6 +25,8 @@ class AnalysedImageSerializerTests(TestCase):
 
         serializer = AnalysedImageSerializer(instance=analysed_image)
         expected = {
+            'pk': analysed_image.pk,
+            'detail_url': reverse('api:image_detail', args=[analysed_image.collection_id, analysed_image.pk]),
             'image': analysed_image.image.url,
             'amazonRekog': {'aws': 'bar'},
             'ibmwatson': {'ibm': 'data'},
@@ -46,6 +49,7 @@ class CollectionDetailSerializerTests(TestCase):
     def test_collection_detail_serializer(self):
         collection = mommy.make(Collection)
         analysed_images = mommy.make(AnalysedImage, collection=collection, _quantity=3)
+        analysed_images = collection.analysed_images.all()
 
         serializer = CollectionDetailSerializer(instance=collection)
         expected = {

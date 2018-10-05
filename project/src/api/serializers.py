@@ -43,6 +43,7 @@ class AnalysedImageSerializer(serializers.ModelSerializer):
     detectron_image = serializers.SerializerMethodField()
     dense_cap_image = serializers.SerializerMethodField()
     dense_cap_full_image = serializers.SerializerMethodField()
+    detail_url = serializers.SerializerMethodField()
 
     def _clean_url(self, url):
         return url.split('?')[0]
@@ -90,6 +91,10 @@ class AnalysedImageSerializer(serializers.ModelSerializer):
         if img:
             return self._clean_url(img.url)
 
+    def get_detail_url(self, analysed_image):
+        args = [analysed_image.collection_id, analysed_image.pk]
+        return reverse('api:image_detail', args=args)
+
     class Meta:
         model = AnalysedImage
-        fields = ['image', 'processed', 'amazonRekog', 'ibmwatson', 'googlecloud', 'microsoftazure', 'yolo_image', 'detectron_image', 'deepAi', 'clarifai', 'dense_cap_image', 'dense_cap_full_image']
+        fields = ['pk', 'image', 'processed', 'amazonRekog', 'ibmwatson', 'googlecloud', 'microsoftazure', 'yolo_image', 'detectron_image', 'deepAi', 'clarifai', 'dense_cap_image', 'dense_cap_full_image', 'detail_url']
