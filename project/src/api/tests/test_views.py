@@ -19,7 +19,7 @@ class ListCollectionsTests(APITestCase):
             'title': self.collection.title,
             'date': formated_date(self.collection.date),
             'id': self.collection.id,
-            'detail_url': reverse('api:list_collections', args=[self.collection.id]),
+            'detail_url': reverse('api:collection_detail', args=[self.collection.id]),
             'processed': self.collection.processed,
         }]
 
@@ -31,7 +31,7 @@ class DetailCollectionTests(APITestCase):
 
     def setUp(self):
         self.collection = mommy.make('core.Collection')
-        self.url = reverse('api:list_collections', args=[self.collection.id])
+        self.url = reverse('api:collection_detail', args=[self.collection.id])
 
     def test_serialize_collection(self):
         response = self.client.get(self.url)

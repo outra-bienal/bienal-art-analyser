@@ -10,7 +10,7 @@ class CollectionSerializer(serializers.ModelSerializer):
     processed = serializers.SerializerMethodField()
 
     def get_detail_url(self, collection):
-        return reverse('api:list_collections', args=[collection.id])
+        return reverse('api:collection_detail', args=[collection.id])
 
     def get_processed(self, collection):
         return collection.processed
