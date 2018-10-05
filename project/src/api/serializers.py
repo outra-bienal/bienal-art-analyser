@@ -38,6 +38,14 @@ class AnalysedImageSerializer(serializers.ModelSerializer):
     microsoftazure = serializers.SerializerMethodField()
     deepAi = serializers.SerializerMethodField()
     clarifai = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    yolo_image = serializers.SerializerMethodField()
+    detectron_image = serializers.SerializerMethodField()
+    dense_cap_image = serializers.SerializerMethodField()
+    dense_cap_full_image = serializers.SerializerMethodField()
+
+    def _clean_url(self, url):
+        return url.split('?')[0]
 
     def get_amazonRekog(self, analysed_image):
         return analysed_image.recokgnition_result
@@ -56,6 +64,31 @@ class AnalysedImageSerializer(serializers.ModelSerializer):
 
     def get_clarifai(self, analysed_image):
         return analysed_image.clarifai_result
+
+    def get_image(self, analysed_image):
+        img = analysed_image.image
+        if img:
+            return self._clean_url(img.url)
+
+    def get_yolo_image(self, analysed_image):
+        img = analysed_image.yolo_image
+        if img:
+            return self._clean_url(img.url)
+
+    def get_detectron_image(self, analysed_image):
+        img = analysed_image.detectron_image
+        if img:
+            return self._clean_url(img.url)
+
+    def get_dense_cap_image(self, analysed_image):
+        img = analysed_image.dense_cap_image
+        if img:
+            return self._clean_url(img.url)
+
+    def get_dense_cap_full_image(self, analysed_image):
+        img = analysed_image.dense_cap_full_image
+        if img:
+            return self._clean_url(img.url)
 
     class Meta:
         model = AnalysedImage
