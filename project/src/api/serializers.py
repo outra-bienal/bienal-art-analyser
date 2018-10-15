@@ -10,14 +10,14 @@ class CollectionSerializer(serializers.ModelSerializer):
     processed = serializers.SerializerMethodField()
 
     def get_detail_url(self, collection):
-        return reverse('api:list_collections', args=[collection.id])
+        return reverse('api:collection_detail', args=[collection.id])
 
     def get_processed(self, collection):
         return collection.processed
 
     class Meta:
         model = Collection
-        fields = '__all__'
+        exclude = ['public']
 
 
 class CollectionDetailSerializer(serializers.ModelSerializer):
@@ -38,6 +38,15 @@ class AnalysedImageSerializer(serializers.ModelSerializer):
     microsoftazure = serializers.SerializerMethodField()
     deepAi = serializers.SerializerMethodField()
     clarifai = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    yolo_image = serializers.SerializerMethodField()
+    detectron_image = serializers.SerializerMethodField()
+    dense_cap_image = serializers.SerializerMethodField()
+    dense_cap_full_image = serializers.SerializerMethodField()
+    detail_url = serializers.SerializerMethodField()
+
+    def _clean_url(self, url):
+        return url.split('?')[0]
 
     def get_amazonRekog(self, analysed_image):
         return analysed_image.recokgnition_result
@@ -57,6 +66,35 @@ class AnalysedImageSerializer(serializers.ModelSerializer):
     def get_clarifai(self, analysed_image):
         return analysed_image.clarifai_result
 
+    def get_image(self, analysed_image):
+        img = analysed_image.image
+        if img:
+            return self._clean_url(img.url)
+
+    def get_yolo_image(self, analysed_image):
+        img = analysed_image.yolo_image
+        if img:
+            return self._clean_url(img.url)
+
+    def get_detectron_image(self, analysed_image):
+        img = analysed_image.detectron_image
+        if img:
+            return self._clean_url(img.url)
+
+    def get_dense_cap_image(self, analysed_image):
+        img = analysed_image.dense_cap_image
+        if img:
+            return self._clean_url(img.url)
+
+    def get_dense_cap_full_image(self, analysed_image):
+        img = analysed_image.dense_cap_full_image
+        if img:
+            return self._clean_url(img.url)
+
+    def get_detail_url(self, analysed_image):
+        args = [analysed_image.collection_id, analysed_image.pk]
+        return reverse('api:image_detail', args=args)
+
     class Meta:
         model = AnalysedImage
-        fields = ['image', 'processed', 'amazonRekog', 'ibmwatson', 'googlecloud', 'microsoftazure', 'yolo_image', 'detectron_image', 'deepAi', 'clarifai', 'dense_cap_image', 'dense_cap_full_image']
+        fields = ['pk', 'image', 'processed', 'amazonRekog', 'ibmwatson', 'googlecloud', 'microsoftazure', 'yolo_image', 'detectron_image', 'deepAi', 'clarifai', 'dense_cap_image', 'dense_cap_full_image', 'detail_url']

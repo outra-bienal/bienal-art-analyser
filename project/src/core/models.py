@@ -8,9 +8,18 @@ from proj_utils.redis import RedisAsyncClient
 from src.core import tasks
 
 
+class CollectionQuerySet(models.QuerySet):
+
+    def public(self):
+        return self.filter(public=True)
+
+
 class Collection(models.Model):
+    objects = CollectionQuerySet.as_manager()
+
     title = models.CharField(max_length=200, verbose_name=_('Título da Coleção'))
     date = models.DateField(verbose_name=_('Data'))
+    public = models.BooleanField(default=True, verbose_name=_('Coleção Pública'))
 
     def run_analysis(self):
         for image in self.analysed_images.all():
