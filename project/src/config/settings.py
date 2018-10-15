@@ -123,6 +123,18 @@ RQ_QUEUES = {
         'DEFAULT_TIMEOUT': 5000,
     },
 }
+CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24 * 90  # 3 months caching
+CACHES = {
+    "default": {
+        "TIMEOUT": CACHE_DEFAULT_TIMEOUT,
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "django-"
+    }
+}
 
 
 # Admin config
