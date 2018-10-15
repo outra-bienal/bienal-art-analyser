@@ -14,6 +14,7 @@ class ListCollectionsTests(APITestCase):
         self.url = reverse('api:list_collections')
 
     def test_serialize_collections(self):
+        mommy.make('core.Collection', public=False)
         response = self.client.get(self.url)
         expected = [{
             'title': self.collection.title,
@@ -39,3 +40,11 @@ class DetailCollectionTests(APITestCase):
 
         assert 200 == response.status_code
         assert expected == response.json()
+
+    def test_404_if_not_public(self):
+        self.collection.public = False
+        self.collection.save()
+
+        response = self.client.get(self.url)
+
+        assert 404 == response.status_code

@@ -17,7 +17,7 @@ class CollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Collection
-        fields = '__all__'
+        exclude = ['public']
 
 
 class CollectionDetailSerializer(serializers.ModelSerializer):
