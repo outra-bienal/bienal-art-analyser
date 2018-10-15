@@ -1,16 +1,27 @@
 from unipath import Path
 
-from django.db import models
 from django.contrib.postgres.fields import JSONField
+from django.core.cache import cache
+from django.db import models
+from django.db.models.signals import post_save
 from django.utils.translation import gettext as _
 
 from proj_utils.redis import RedisAsyncClient
 from src.core import tasks
 
 
+class CollectionQuerySet(models.QuerySet):
+
+    def public(self):
+        return self.filter(public=True)
+
+
 class Collection(models.Model):
+    objects = CollectionQuerySet.as_manager()
+
     title = models.CharField(max_length=200, verbose_name=_('Título da Coleção'))
     date = models.DateField(verbose_name=_('Data'))
+    public = models.BooleanField(default=True, verbose_name=_('Coleção Pública'))
 
     def run_analysis(self):
         for image in self.analysed_images.all():
@@ -159,3 +170,11 @@ class AnalysedImage(models.Model):
         verbose_name = _('Análise de Imagem')
         verbose_name_plural = _('Análise de Imagem')
         ordering = ['image']
+
+
+def clear_cache(sender, instance, **kwargs):
+    cache.clear()
+
+
+post_save.connect(clear_cache, sender=Collection)
+post_save.connect(clear_cache, sender=AnalysedImage)

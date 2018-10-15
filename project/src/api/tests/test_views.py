@@ -14,12 +14,13 @@ class ListCollectionsTests(APITestCase):
         self.url = reverse('api:list_collections')
 
     def test_serialize_collections(self):
+        mommy.make('core.Collection', public=False)
         response = self.client.get(self.url)
         expected = [{
             'title': self.collection.title,
             'date': formated_date(self.collection.date),
             'id': self.collection.id,
-            'detail_url': reverse('api:list_collections', args=[self.collection.id]),
+            'detail_url': reverse('api:collection_detail', args=[self.collection.id]),
             'processed': self.collection.processed,
         }]
 
@@ -31,7 +32,7 @@ class DetailCollectionTests(APITestCase):
 
     def setUp(self):
         self.collection = mommy.make('core.Collection')
-        self.url = reverse('api:list_collections', args=[self.collection.id])
+        self.url = reverse('api:collection_detail', args=[self.collection.id])
 
     def test_serialize_collection(self):
         response = self.client.get(self.url)
@@ -39,3 +40,11 @@ class DetailCollectionTests(APITestCase):
 
         assert 200 == response.status_code
         assert expected == response.json()
+
+    def test_404_if_not_public(self):
+        self.collection.public = False
+        self.collection.save()
+
+        response = self.client.get(self.url)
+
+        assert 404 == response.status_code
