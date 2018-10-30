@@ -104,7 +104,7 @@ class AnalysedImageAdmin(admin.ModelAdmin):
 
     def link_to_collection(self, obj):
         link = reverse("admin:core_collection_change", args=[obj.collection.id])
-        tag = '<a href="%s">%s</a>' % (link, obj.collection.title)
+        tag = '<a href="{}">{} - ID ({})</a>'.format(link, obj.collection.title, obj.collection.id)
         return format_html(tag)
     link_to_collection.short_description = _('Coleção')
 
