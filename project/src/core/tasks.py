@@ -172,3 +172,26 @@ def generate_dense_cap_image_task(analysed_image_id):
 
     db_image.save()
     temp_file.remove()
+
+
+def run_all_tasks(analysed_image_id):
+    from src.core.models import AnalysedImage
+    try:
+        db_image = AnalysedImage.objects.get(id=analysed_image_id)
+    except AnalysedImage.DoesNotExist:
+        return None
+
+    field_tasks = {
+        'recokgnition_result': (aws_analyse_image_task, 'recokgnition_job_id'),
+        'ibm_watson_result': (ibm_analyse_image_task, 'ibm_watson_job_id'),
+        'google_vision_result': (google_analyse_image_task, 'google_vision_job_id'),
+        'azure_vision_result': (azure_analyse_image_task, 'azure_vision_job_id'),
+        'deep_ai_result': (deep_ai_analyse_image_task, 'deep_ai_job_id'),
+        'clarifai_result': (clarifai_analyse_image_task, 'clarifai_job_id'),
+        'yolo_image': (yolo_detect_image_task, 'yolo_job_id'),
+    }
+
+    for fieldname, field_data in field_tasks.items():
+        if not getattr(db_image, fieldname):
+            task, job_id_field = field_data
+            task(db_image.id)
