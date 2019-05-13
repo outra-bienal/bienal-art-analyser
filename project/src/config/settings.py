@@ -115,7 +115,7 @@ USE_TZ = True
 
 
 # Django RQ
-REDIS_URL = config('REDIS_URL', default='redis://localhost:50002')
+REDIS_URL = config('REDIS_URL', default='redis://localhost:6379')
 RQ_QUEUES = {
     'default': {
         'URL': REDIS_URL,
