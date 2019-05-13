@@ -120,7 +120,8 @@ RQ_QUEUES = {
     'default': {
         'URL': REDIS_URL,
         'DB': 0,
-        'DEFAULT_TIMEOUT': 5000,
+        'DEFAULT_TIMEOUT': 60 * 10,
+        'SOCKET_TIMEOUT': None,
     },
 }
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24 * 90  # 3 months caching

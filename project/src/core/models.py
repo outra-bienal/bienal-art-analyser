@@ -122,9 +122,9 @@ class AnalysedImage(models.Model):
         }
 
         for fieldname, field_data in field_tasks.items():
-            task, job_id_field = field_data
-            task(self.id)
-
+            if not getattr(self, fieldname):
+                task, job_id_field = field_data
+                task(self.id)
 
     def enqueue_dense_cap_image(self):
         if 'DenseCap' not in self.deep_ai_result:
