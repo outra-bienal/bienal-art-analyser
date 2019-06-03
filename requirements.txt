@@ -1,4 +1,4 @@
-Django==2.0.8
+Django==2.0.11
 Unipath==1.1
 dj-database-url==0.5.0
 django-extensions==2.0.7
@@ -17,7 +17,7 @@ raven==6.9.0
 djangorestframework==3.9.4
 django-cors-headers==2.4.0
 watson-developer-cloud==1.5.0
-requests==2.19.1
+requests==2.20.0
 tqdm==4.24.0
 clarifai==2.2.3
 git+https://github.com/outra-bienal/wcag-contrast-ratio.git@master
