@@ -51,7 +51,7 @@ class CollectionAdmin(admin.ModelAdmin):
     processed.boolean = True
 
     def link_to_images(self, obj):
-        qs = urlencode({'collection__title': obj.title})
+        qs = urlencode({'collection': obj.id})
         link = reverse("admin:core_analysedimage_changelist") + '?' + qs
         tag = '<a href="%s">%s</a>' % (link, _("Listar imagens"))
         return format_html(tag)

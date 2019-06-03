@@ -115,12 +115,13 @@ USE_TZ = True
 
 
 # Django RQ
-REDIS_URL = config('REDIS_URL', default='redis://localhost:50002')
+REDIS_URL = config('REDIS_URL', default='redis://localhost:6379')
 RQ_QUEUES = {
     'default': {
         'URL': REDIS_URL,
         'DB': 0,
-        'DEFAULT_TIMEOUT': 5000,
+        'DEFAULT_TIMEOUT': 60 * 10,
+        'SOCKET_TIMEOUT': None,
     },
 }
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24 * 90  # 3 months caching
