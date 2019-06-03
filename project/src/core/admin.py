@@ -31,7 +31,6 @@ class AnalysedImageInline(admin.TabularInline):
 class CollectionAdmin(admin.ModelAdmin):
     suit_form_tabs = (('colecao', _('Coleção')), ('images', _('Imagens')))
     list_display = ['title', 'date', 'processed', 'link_to_images', 'public']
-    readonly_fields = ['triggered_analysis']
     list_filter = ['public']
     inlines = [AnalysedImageInline]
     actions = ['run_analysis', 'generate_dense_cap_images']

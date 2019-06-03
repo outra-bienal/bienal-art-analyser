@@ -22,14 +22,11 @@ class Collection(models.Model):
     title = models.CharField(max_length=200, verbose_name=_('Título da Coleção'))
     date = models.DateField(verbose_name=_('Data'))
     public = models.BooleanField(default=True, verbose_name=_('Coleção Pública'))
-    triggered_analysis = models.BooleanField(default=False)
 
     def run_analysis(self):
         for image in self.analysed_images.all():
             if not image.processed:
-                image.enqueue_analysis()
-        self.triggered_analysis = True
-        self.save()
+                image.enqueue_analysis(single_batch=True)
 
     def generate_dense_cap_images(self):
         for image in self.analysed_images.all():
