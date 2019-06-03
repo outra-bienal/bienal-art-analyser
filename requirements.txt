@@ -14,7 +14,7 @@ psycopg2-binary==2.7.5
 Pillow==5.2.0
 django-rq==1.2.0
 raven==6.9.0
-djangorestframework==3.8.2
+djangorestframework==3.9.4
 django-cors-headers==2.4.0
 watson-developer-cloud==1.5.0
 requests==2.19.1
@@ -24,3 +24,4 @@ git+https://github.com/outra-bienal/wcag-contrast-ratio.git@master
 opencv-contrib-python-headless==3.4.2.17
 opencv-python-headless==3.4.2.17
 django-redis==4.9.0
+rq==0.12.0
