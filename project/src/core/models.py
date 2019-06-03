@@ -26,7 +26,7 @@ class Collection(models.Model):
     def run_analysis(self):
         for image in self.analysed_images.all():
             if not image.processed:
-                image.enqueue_analysis(single_batch=True)
+                image.enqueue_analysis()
 
     def generate_dense_cap_images(self):
         for image in self.analysed_images.all():
@@ -87,33 +87,28 @@ class AnalysedImage(models.Model):
             self.clarifai_result,
         ])
 
-    def enqueue_analysis(self, single_batch=False):
+    def enqueue_analysis(self):
         client = RedisAsyncClient()
 
-        if single_batch:
-            job = client.enqueue_default(
-                tasks.run_all_tasks, self.id
-            )
-        else:
-            field_tasks = {
-                'recokgnition_result': (tasks.aws_analyse_image_task, 'recokgnition_job_id'),
-                'ibm_watson_result': (tasks.ibm_analyse_image_task, 'ibm_watson_job_id'),
-                'google_vision_result': (tasks.google_analyse_image_task, 'google_vision_job_id'),
-                'azure_vision_result': (tasks.azure_analyse_image_task, 'azure_vision_job_id'),
-                'deep_ai_result': (tasks.deep_ai_analyse_image_task, 'deep_ai_job_id'),
-                'clarifai_result': (tasks.clarifai_analyse_image_task, 'clarifai_job_id'),
-                'yolo_image': (tasks.yolo_detect_image_task, 'yolo_job_id'),
-            }
+        field_tasks = {
+            'recokgnition_result': (tasks.aws_analyse_image_task, 'recokgnition_job_id'),
+            'ibm_watson_result': (tasks.ibm_analyse_image_task, 'ibm_watson_job_id'),
+            'google_vision_result': (tasks.google_analyse_image_task, 'google_vision_job_id'),
+            'azure_vision_result': (tasks.azure_analyse_image_task, 'azure_vision_job_id'),
+            'deep_ai_result': (tasks.deep_ai_analyse_image_task, 'deep_ai_job_id'),
+            'clarifai_result': (tasks.clarifai_analyse_image_task, 'clarifai_job_id'),
+            'yolo_image': (tasks.yolo_detect_image_task, 'yolo_job_id'),
+        }
 
-            update_fields = []
-            for fieldname, field_data in field_tasks.items():
-                task, job_id_field = field_data
-                if not getattr(self, fieldname):
-                    job = client.enqueue_default(task, self.id)
-                    setattr(self, job_id_field, str(job.id))
-                    update_fields.append(job_id_field)
+        update_fields = []
+        for fieldname, field_data in field_tasks.items():
+            task, job_id_field = field_data
+            if not getattr(self, fieldname):
+                job = client.enqueue_default(task, self.id)
+                setattr(self, job_id_field, str(job.id))
+                update_fields.append(job_id_field)
 
-            self.save(update_fields=update_fields)
+        self.save(update_fields=update_fields)
 
     def process_analysis(self):
         field_tasks = {
