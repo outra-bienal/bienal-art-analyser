@@ -26,3 +26,4 @@ opencv-python-headless==3.4.2.17
 django-redis==4.10.0
 rq==0.12.0
 celery==4.3.0
+django-celery-results==1.1.1
