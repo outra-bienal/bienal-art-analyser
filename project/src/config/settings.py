@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'storages',
     'src.api',
     'src.core',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -161,6 +162,12 @@ YOLO_WEIGHTS = config('YOLO_WEIGHTS', default=DARKNET_DIR.child('yolov3.weights'
 #APP config
 LOAD_COLLECTIONS_DIR = config('LOAD_COLLECTIONS_DIR', default='/tmp/', cast=Path)
 TEMP_DIR = LOAD_COLLECTIONS_DIR
+
+# Celery config
+CELERY_BROKER_URL = config('CELERY_BROKER_URL')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
 
 import django_heroku
 django_heroku.settings(locals())
