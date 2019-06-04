@@ -172,3 +172,11 @@ def generate_dense_cap_image_task(analysed_image_id):
 
     db_image.save()
     temp_file.remove()
+
+
+from celery import shared_task
+
+@shared_task
+def hello():
+    print("hi")
+    return 2 + 2
