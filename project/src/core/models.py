@@ -88,8 +88,6 @@ class AnalysedImage(models.Model):
         ])
 
     def enqueue_analysis(self):
-        client = RedisAsyncClient()
-
         field_tasks = {
             'recokgnition_result': (tasks.aws_analyse_image_task, 'recokgnition_job_id'),
             'ibm_watson_result': (tasks.ibm_analyse_image_task, 'ibm_watson_job_id'),
@@ -104,7 +102,7 @@ class AnalysedImage(models.Model):
         for fieldname, field_data in field_tasks.items():
             task, job_id_field = field_data
             if not getattr(self, fieldname):
-                job = client.enqueue_default(task, self.id)
+                job = task.delay(self.id)
                 setattr(self, job_id_field, str(job.id))
                 update_fields.append(job_id_field)
 
