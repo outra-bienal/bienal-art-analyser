@@ -111,7 +111,7 @@ def yolo_detect_image_task(analysed_image_id):
     with open(temp_file, 'bw') as fd:
         fd.write(db_image.image.read())
 
-    pred_file = Path(settings.DARKNET_DIR, 'pred-{}.png'.format(clean_filename))
+    pred_file = Path(settings.TEMP_DIR, 'pred-{}.png'.format(clean_filename))
     command = ' '.join([
         settings.DARKNET_BIN,
         'detect',
@@ -181,9 +181,3 @@ def generate_dense_cap_image_task(analysed_image_id):
 
     db_image.save()
     temp_file.remove()
-
-
-@shared_task
-def hello():
-    print("hi")
-    return 2 + 2
