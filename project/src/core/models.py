@@ -49,21 +49,21 @@ class AnalysedImage(models.Model):
 
     collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
     image = models.ImageField(upload_to=BASE_UPLOAD, verbose_name=_('Imagem'))
-    recokgnition_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
+    recokgnition_result = JSONField(default=dict, blank=True, verbose_name=_('AWS Recokgnition'))
     recokgnition_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Id job de análise'))
-    ibm_watson_result = JSONField(default={}, blank=True, verbose_name=_('IBM Watson'))
+    ibm_watson_result = JSONField(default=dict, blank=True, verbose_name=_('IBM Watson'))
     ibm_watson_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('IBM Watson Job'))
 
-    google_vision_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
+    google_vision_result = JSONField(default=dict, blank=True, verbose_name=_('AWS Recokgnition'))
     google_vision_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Google Job'))
 
-    azure_vision_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
+    azure_vision_result = JSONField(default=dict, blank=True, verbose_name=_('AWS Recokgnition'))
     azure_vision_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Azure Job'))
 
-    deep_ai_result = JSONField(default={}, blank=True, verbose_name=_('Deep AI'))
+    deep_ai_result = JSONField(default=dict, blank=True, verbose_name=_('Deep AI'))
     deep_ai_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Deep AI Job'))
 
-    clarifai_result = JSONField(default={}, blank=True, verbose_name=_('Clarifai'))
+    clarifai_result = JSONField(default=dict, blank=True, verbose_name=_('Clarifai'))
     clarifai_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Clarifai Job'))
 
     detectron_image = models.ImageField(upload_to=DETECTRON_UPLOAD, verbose_name=_('Output Detectron'), null=True)
