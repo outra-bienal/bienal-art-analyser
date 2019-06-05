@@ -131,6 +131,9 @@ def yolo_detect_image_task(analysed_image_id):
     )
     detect.wait()
 
+    print("Finshed yolo analysis!")
+    print("Prediction file is located at: " + pred_file.absolute())
+
     db_image.write_yolo_file(pred_file)
     db_image.save()
 
