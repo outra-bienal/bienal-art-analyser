@@ -112,8 +112,7 @@ class AnalysedImage(models.Model):
         if 'DenseCap' not in self.deep_ai_result:
             return
 
-        client = RedisAsyncClient()
-        job = client.enqueue_default(tasks.generate_dense_cap_image_task, self.id)
+        job = tasks.generate_dense_cap_image_task.delay(self.id)
         self.dense_cap_job_id = str(job.id)
         self.save(update_fields=['dense_cap_job_id'])
 
