@@ -7,7 +7,7 @@ from datetime import timedelta
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "src.config.settings")
 
-app = Celery('src')
+app = Celery('core')
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
