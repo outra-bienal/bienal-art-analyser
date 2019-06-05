@@ -108,22 +108,6 @@ class AnalysedImage(models.Model):
 
         self.save(update_fields=update_fields)
 
-    def process_analysis(self):
-        field_tasks = {
-            'recokgnition_result': (tasks.aws_analyse_image_task, 'recokgnition_job_id'),
-            'ibm_watson_result': (tasks.ibm_analyse_image_task, 'ibm_watson_job_id'),
-            'google_vision_result': (tasks.google_analyse_image_task, 'google_vision_job_id'),
-            'azure_vision_result': (tasks.azure_analyse_image_task, 'azure_vision_job_id'),
-            'deep_ai_result': (tasks.deep_ai_analyse_image_task, 'deep_ai_job_id'),
-            'clarifai_result': (tasks.clarifai_analyse_image_task, 'clarifai_job_id'),
-            'yolo_image': (tasks.yolo_detect_image_task, 'yolo_job_id'),
-        }
-
-        for fieldname, field_data in field_tasks.items():
-            if not getattr(self, fieldname):
-                task, job_id_field = field_data
-                task(self.id)
-
     def enqueue_dense_cap_image(self):
         if 'DenseCap' not in self.deep_ai_result:
             return
