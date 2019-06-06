@@ -111,7 +111,7 @@ def yolo_detect_image_task(analysed_image_id):
     with open(temp_file, 'bw') as fd:
         fd.write(db_image.image.read())
 
-    pred_file = Path(settings.TEMP_DIR, 'pred-{}.png'.format(clean_filename))
+    pred_file = Path(settings.DARKNET_DIR, 'pred-{}.png'.format(clean_filename))
     command = ' '.join([
         settings.DARKNET_BIN,
         'detect',
@@ -130,6 +130,9 @@ def yolo_detect_image_task(analysed_image_id):
         cwd=settings.DARKNET_DIR,
     )
     detect.wait()
+
+    if not pred_file.exists():
+        pred_file = Path(settings.DARKNET_DIR, 'pred-{}.jpg'.format(clean_filename))
 
     print("Finshed yolo analysis!")
     print("Prediction file is located at: " + pred_file.absolute())
