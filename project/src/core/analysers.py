@@ -9,6 +9,10 @@ from clarifai.rest import ClarifaiApp
 from django.conf import settings
 
 
+class AnalysisError(Exception):
+    pass
+
+
 def aws_analyser(image_url):
     client = boto3.client(
         'rekognition',
@@ -29,8 +33,7 @@ def aws_analyser(image_url):
             'celebs': client.recognize_celebrities(Image=image)
         }
     except Exception as e:
-        print(e)
-        return None
+        raise AnalysisError(str(e))
 
 
 def ibm_analyser(image_url):
@@ -47,8 +50,7 @@ def ibm_analyser(image_url):
             'faces': client.detect_faces(parameters=params)['images'][0],
         }
     except Exception as e:
-        print(e)
-        return None
+        raise AnalysisError(str(e))
 
 
 def google_analyser(image_url):
@@ -71,6 +73,9 @@ def google_analyser(image_url):
     response = requests.post(api_url, json={'requests': [request]}, params=qs)
     if response.ok:
         return response.json()['responses'][0]
+    else:
+        msg = str(response.status_code) + '\n\n' + str(response.content)
+        raise AnalysisError(msg)
 
 
 def azure_analyser(image_url):
@@ -87,6 +92,9 @@ def azure_analyser(image_url):
 
     if response.ok:
         return {'main': response.json()}
+    else:
+        msg = str(response.status_code) + '\n\n' + str(response.content)
+        raise AnalysisError(msg)
 
 
 def deep_ai_analyser(image_url):
@@ -98,6 +106,9 @@ def deep_ai_analyser(image_url):
 
     if response.ok and 'err' not in response.json():
         return {'DenseCap': response.json()}
+    else:
+        msg = str(response.status_code) + '\n\n' + str(response.content)
+        raise AnalysisError(msg)
 
 
 def clarifai_analyser(image_url):

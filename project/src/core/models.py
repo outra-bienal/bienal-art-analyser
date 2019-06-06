@@ -49,21 +49,21 @@ class AnalysedImage(models.Model):
 
     collection = models.ForeignKey(Collection, related_name='analysed_images', on_delete=models.CASCADE, verbose_name=_('Coleção'))
     image = models.ImageField(upload_to=BASE_UPLOAD, verbose_name=_('Imagem'))
-    recokgnition_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
+    recokgnition_result = JSONField(default=dict, blank=True, verbose_name=_('AWS Recokgnition'))
     recokgnition_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Id job de análise'))
-    ibm_watson_result = JSONField(default={}, blank=True, verbose_name=_('IBM Watson'))
+    ibm_watson_result = JSONField(default=dict, blank=True, verbose_name=_('IBM Watson'))
     ibm_watson_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('IBM Watson Job'))
 
-    google_vision_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
+    google_vision_result = JSONField(default=dict, blank=True, verbose_name=_('AWS Recokgnition'))
     google_vision_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Google Job'))
 
-    azure_vision_result = JSONField(default={}, blank=True, verbose_name=_('AWS Recokgnition'))
+    azure_vision_result = JSONField(default=dict, blank=True, verbose_name=_('AWS Recokgnition'))
     azure_vision_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Azure Job'))
 
-    deep_ai_result = JSONField(default={}, blank=True, verbose_name=_('Deep AI'))
+    deep_ai_result = JSONField(default=dict, blank=True, verbose_name=_('Deep AI'))
     deep_ai_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Deep AI Job'))
 
-    clarifai_result = JSONField(default={}, blank=True, verbose_name=_('Clarifai'))
+    clarifai_result = JSONField(default=dict, blank=True, verbose_name=_('Clarifai'))
     clarifai_job_id = models.CharField(max_length=50, default='', blank=True, verbose_name=_('Clarifai Job'))
 
     detectron_image = models.ImageField(upload_to=DETECTRON_UPLOAD, verbose_name=_('Output Detectron'), null=True)
@@ -88,8 +88,6 @@ class AnalysedImage(models.Model):
         ])
 
     def enqueue_analysis(self):
-        client = RedisAsyncClient()
-
         field_tasks = {
             'recokgnition_result': (tasks.aws_analyse_image_task, 'recokgnition_job_id'),
             'ibm_watson_result': (tasks.ibm_analyse_image_task, 'ibm_watson_job_id'),
@@ -104,34 +102,17 @@ class AnalysedImage(models.Model):
         for fieldname, field_data in field_tasks.items():
             task, job_id_field = field_data
             if not getattr(self, fieldname):
-                job = client.enqueue_default(task, self.id)
+                job = task.delay(self.id)
                 setattr(self, job_id_field, str(job.id))
                 update_fields.append(job_id_field)
 
         self.save(update_fields=update_fields)
 
-    def process_analysis(self):
-        field_tasks = {
-            'recokgnition_result': (tasks.aws_analyse_image_task, 'recokgnition_job_id'),
-            'ibm_watson_result': (tasks.ibm_analyse_image_task, 'ibm_watson_job_id'),
-            'google_vision_result': (tasks.google_analyse_image_task, 'google_vision_job_id'),
-            'azure_vision_result': (tasks.azure_analyse_image_task, 'azure_vision_job_id'),
-            'deep_ai_result': (tasks.deep_ai_analyse_image_task, 'deep_ai_job_id'),
-            'clarifai_result': (tasks.clarifai_analyse_image_task, 'clarifai_job_id'),
-            'yolo_image': (tasks.yolo_detect_image_task, 'yolo_job_id'),
-        }
-
-        for fieldname, field_data in field_tasks.items():
-            if not getattr(self, fieldname):
-                task, job_id_field = field_data
-                task(self.id)
-
     def enqueue_dense_cap_image(self):
         if 'DenseCap' not in self.deep_ai_result:
             return
 
-        client = RedisAsyncClient()
-        job = client.enqueue_default(tasks.generate_dense_cap_image_task, self.id)
+        job = tasks.generate_dense_cap_image_task.delay(self.id)
         self.dense_cap_job_id = str(job.id)
         self.save(update_fields=['dense_cap_job_id'])
 

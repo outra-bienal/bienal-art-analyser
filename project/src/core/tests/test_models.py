@@ -29,110 +29,88 @@ class AnalysedImageModelTests(TestCase):
         if self.analysed_image.detectron_image:
             self.analysed_image.detectron_image.delete()
 
-    @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
-    def test_do_not_enqueue_if_data(self):
-        client = RedisAsyncClient()
-
-        self.analysed_image.enqueue_analysis()
-
-        assert client.enqueue_default.called is False
-
-    @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
-    def test_enqueue_aws_analysis(self):
+    @patch('src.core.models.tasks')
+    def test_enqueue_aws_analysis(self, mocked_tasks):
+        mocked_tasks.aws_analyse_image_task.delay.return_value = Mock(id=42)
         self.analysed_image.recokgnition_result = {}
         self.analysed_image.save()
-        client = RedisAsyncClient()
 
         self.analysed_image.enqueue_analysis()
         self.analysed_image.refresh_from_db()
 
-        client.enqueue_default.assert_called_once_with(
-            tasks.aws_analyse_image_task, self.analysed_image.id
-        )
+        mocked_tasks.aws_analyse_image_task.delay.assert_called_once_with(self.analysed_image.id)
         self.analysed_image.recokgnition_job_id = '42'
 
-    @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
-    def test_enqueue_ibm_analysis(self):
+    @patch('src.core.models.tasks')
+    def test_enqueue_ibm_analysis(self, mocked_tasks):
+        mocked_tasks.ibm_analyse_image_task.delay.return_value = Mock(id=42)
         self.analysed_image.ibm_watson_result = {}
         self.analysed_image.save()
-        client = RedisAsyncClient()
 
         self.analysed_image.enqueue_analysis()
         self.analysed_image.refresh_from_db()
 
-        client.enqueue_default.assert_called_once_with(
-            tasks.ibm_analyse_image_task, self.analysed_image.id
-        )
+        mocked_tasks.ibm_analyse_image_task.delay.assert_called_once_with(self.analysed_image.id)
         self.analysed_image.ibm_watson_job_id = '42'
 
-    @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
-    def test_enqueue_google_analysis(self):
+    @patch('src.core.models.tasks')
+    def test_enqueue_google_analysis(self, mocked_tasks):
+        mocked_tasks.google_analyse_image_task.delay.return_value = Mock(id=42)
         self.analysed_image.google_vision_result = {}
         self.analysed_image.save()
-        client = RedisAsyncClient()
 
         self.analysed_image.enqueue_analysis()
         self.analysed_image.refresh_from_db()
 
-        client.enqueue_default.assert_called_once_with(
-            tasks.google_analyse_image_task, self.analysed_image.id
-        )
+        mocked_tasks.google_analyse_image_task.delay.assert_called_once_with(self.analysed_image.id)
         self.analysed_image.google_vision_job_id = '42'
 
-    @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
-    def test_enqueue_azure_analysis(self):
+    @patch('src.core.models.tasks')
+    def test_enqueue_azure_analysis(self, mocked_tasks):
+        mocked_tasks.azure_analyse_image_task.delay.return_value = Mock(id=42)
         self.analysed_image.azure_vision_result = {}
         self.analysed_image.save()
-        client = RedisAsyncClient()
 
         self.analysed_image.enqueue_analysis()
         self.analysed_image.refresh_from_db()
 
-        client.enqueue_default.assert_called_once_with(
-            tasks.azure_analyse_image_task, self.analysed_image.id
-        )
+        mocked_tasks.azure_analyse_image_task.delay.assert_called_once_with(self.analysed_image.id)
         self.analysed_image.azure_vision_job_id = '42'
 
-    @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
-    def test_enqueue_deep_ai_analysis(self):
+    @patch('src.core.models.tasks')
+    def test_enqueue_deep_ai_analysis(self, mocked_tasks):
+        mocked_tasks.deep_ai_analyse_image_task.delay.return_value = Mock(id=42)
         self.analysed_image.deep_ai_result = {}
         self.analysed_image.save()
-        client = RedisAsyncClient()
 
         self.analysed_image.enqueue_analysis()
         self.analysed_image.refresh_from_db()
 
-        client.enqueue_default.assert_called_once_with(
-            tasks.deep_ai_analyse_image_task, self.analysed_image.id
-        )
+        mocked_tasks.deep_ai_analyse_image_task.delay.assert_called_once_with(self.analysed_image.id)
         self.analysed_image.deep_ai_job_id = '42'
 
-    @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
-    def test_enqueue_clarifai_analysis(self):
+    @patch('src.core.models.tasks')
+    def test_enqueue_clarifai_analysis(self, mocked_tasks):
+        mocked_tasks.clarifai_analyse_image_task.delay.return_value = Mock(id=42)
         self.analysed_image.clarifai_result = {}
         self.analysed_image.save()
-        client = RedisAsyncClient()
 
         self.analysed_image.enqueue_analysis()
         self.analysed_image.refresh_from_db()
 
-        client.enqueue_default.assert_called_once_with(
-            tasks.clarifai_analyse_image_task, self.analysed_image.id
-        )
+        mocked_tasks.clarifai_analyse_image_task.delay.assert_called_once_with(self.analysed_image.id)
         self.analysed_image.clarifai_job_id = '42'
 
-    @patch.object(RedisAsyncClient, 'enqueue_default', Mock(id=42))
-    def test_enqueue_yolo_detection(self):
+    @patch('src.core.models.tasks')
+    def test_enqueue_yolo_detection(self, mocked_tasks):
+        mocked_tasks.yolo_detect_image_task.delay.return_value = Mock(id=42)
         self.analysed_image.yolo_image.delete()
         self.analysed_image.save()
-        client = RedisAsyncClient()
 
         self.analysed_image.enqueue_analysis()
         self.analysed_image.refresh_from_db()
 
-        client.enqueue_default.assert_called_once_with(
-            tasks.yolo_detect_image_task, self.analysed_image.id
-        )
+        mocked_tasks.yolo_detect_image_task.delay.assert_called_once_with(self.analysed_image.id)
         self.analysed_image.yolo_job_id = '42'
 
     def test_processed_tag(self):
