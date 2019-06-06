@@ -1,6 +1,7 @@
 import cv2
 import shlex
 import subprocess
+from celery import shared_task
 from unipath import Path
 from urllib.parse import urlparse
 
@@ -11,6 +12,7 @@ from src.core import analysers
 from src.core import tag_image
 
 
+@shared_task
 def aws_analyse_image_task(analysed_image_id):
     from src.core.models import AnalysedImage
     try:
@@ -24,6 +26,7 @@ def aws_analyse_image_task(analysed_image_id):
         db_image.save(update_fields=['recokgnition_result'])
 
 
+@shared_task
 def ibm_analyse_image_task(analysed_image_id):
     from src.core.models import AnalysedImage
     try:
@@ -37,6 +40,7 @@ def ibm_analyse_image_task(analysed_image_id):
         db_image.save(update_fields=['ibm_watson_result'])
 
 
+@shared_task
 def google_analyse_image_task(analysed_image_id):
     from src.core.models import AnalysedImage
     try:
@@ -50,6 +54,7 @@ def google_analyse_image_task(analysed_image_id):
         db_image.save(update_fields=['google_vision_result'])
 
 
+@shared_task
 def azure_analyse_image_task(analysed_image_id):
     from src.core.models import AnalysedImage
     try:
@@ -63,6 +68,7 @@ def azure_analyse_image_task(analysed_image_id):
         db_image.save(update_fields=['azure_vision_result'])
 
 
+@shared_task
 def deep_ai_analyse_image_task(analysed_image_id):
     from src.core.models import AnalysedImage
     try:
@@ -76,6 +82,7 @@ def deep_ai_analyse_image_task(analysed_image_id):
         db_image.save(update_fields=['deep_ai_result'])
 
 
+@shared_task
 def clarifai_analyse_image_task(analysed_image_id):
     from src.core.models import AnalysedImage
     try:
@@ -89,6 +96,7 @@ def clarifai_analyse_image_task(analysed_image_id):
         db_image.save(update_fields=['clarifai_result'])
 
 
+@shared_task
 def yolo_detect_image_task(analysed_image_id):
     from src.core.models import AnalysedImage
     try:
@@ -123,6 +131,12 @@ def yolo_detect_image_task(analysed_image_id):
     )
     detect.wait()
 
+    if not pred_file.exists():
+        pred_file = Path(settings.DARKNET_DIR, 'pred-{}.jpg'.format(clean_filename))
+
+    print("Finshed yolo analysis!")
+    print("Prediction file is located at: " + pred_file.absolute())
+
     db_image.write_yolo_file(pred_file)
     db_image.save()
 
@@ -131,6 +145,7 @@ def yolo_detect_image_task(analysed_image_id):
     print('Success!')
 
 
+@shared_task
 def generate_dense_cap_image_task(analysed_image_id):
     from src.core.models import AnalysedImage
     try:

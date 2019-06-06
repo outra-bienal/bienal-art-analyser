@@ -14,3 +14,11 @@ services:
             - "50002:6379"
         volumes:
             - "./srv/docker/redis/:/data/"
+    art_analyser_rabbitmq:
+        image: rabbitmq:alpine
+        env_file: .env
+        ports:
+            - "50003:5672"
+            - "8080:15672"
+        volumes:
+            - "./srv/docker/rabbitmq/:/data/"

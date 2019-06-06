@@ -1,4 +1,4 @@
-Django==2.0.11
+Django>=2.0.11
 Unipath==1.1
 dj-database-url==0.5.0
 django-extensions==2.0.7
@@ -23,5 +23,7 @@ clarifai==2.2.3
 git+https://github.com/outra-bienal/wcag-contrast-ratio.git@master
 opencv-contrib-python-headless==3.4.2.17
 opencv-python-headless==3.4.2.17
-django-redis==4.9.0
+django-redis==4.10.0
 rq==0.12.0
+celery==4.3.0
+django-celery-results==1.1.1

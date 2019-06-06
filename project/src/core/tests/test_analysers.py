@@ -1,3 +1,4 @@
+import pytest
 from urllib.parse import urlencode
 import json
 import responses
@@ -9,7 +10,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from .sample_responses import *
-from src.core.analysers import aws_analyser, ibm_analyser, google_analyser, azure_analyser, deep_ai_analyser
+from src.core.analysers import aws_analyser, ibm_analyser, google_analyser, azure_analyser, deep_ai_analyser, AnalysisError
 
 
 class TestAWSAnalyser(TestCase):
@@ -47,14 +48,13 @@ class TestAWSAnalyser(TestCase):
         client.recognize_celebrities.assert_called_once_with(**kwargs)
 
     @patch('src.core.analysers.boto3')
-    def test_return_none_if_any_error(self, MockedBoto3):
+    def test_raise_exception_if_any_error(self, MockedBoto3):
         client = Mock()
         client.detect_labels.side_effect = Exception
         MockedBoto3.client.return_value = client
 
-        data = aws_analyser(self.image_url)
-
-        assert data is None
+        with pytest.raises(AnalysisError):
+            aws_analyser(self.image_url)
 
 
 class TestIBMAnalyser(TestCase):
@@ -85,14 +85,13 @@ class TestIBMAnalyser(TestCase):
         client.detect_faces.assert_called_once_with(parameters=face_params)
 
     @patch('src.core.analysers.VisualRecognitionV3')
-    def test_return_none_if_any_error(self, MockedVisualRecognitionV3):
+    def test_raise_exception_if_any_error(self, MockedVisualRecognitionV3):
         client = Mock(VisualRecognitionV3)
         client.classify.side_effect = Exception
         MockedVisualRecognitionV3.return_value = client
 
-        data = ibm_analyser(self.image_url)
-
-        assert data is None
+        with pytest.raises(AnalysisError):
+            ibm_analyser(self.image_url)
 
 
 class TestGoogleAnalyser(TestCase):
@@ -129,7 +128,7 @@ class TestGoogleAnalyser(TestCase):
         assert {'requests': [expected_request]} == json_data
 
     @responses.activate
-    def test_fails_silently_if_error(self):
+    def test_raise_exception_if_any_error(self):
         url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(settings.GOOGLE_VISION_API_KEY)
         responses.add(
             responses.POST,
@@ -139,9 +138,8 @@ class TestGoogleAnalyser(TestCase):
             match_querystring=True
         )
 
-        data = google_analyser(self.image_url)
-
-        assert data is None
+        with pytest.raises(AnalysisError):
+            google_analyser(self.image_url)
 
 
 class TestAzureAnalyser(TestCase):
@@ -176,7 +174,7 @@ class TestAzureAnalyser(TestCase):
         assert expected_request == json_data
 
     @responses.activate
-    def test_fails_silently_if_error(self):
+    def test_raise_exception_if_any_error(self):
         responses.add(
             responses.POST,
             self.url,
@@ -186,9 +184,8 @@ class TestAzureAnalyser(TestCase):
             headers=self.headers,
         )
 
-        data = azure_analyser(self.image_url)
-
-        assert data is None
+        with pytest.raises(AnalysisError):
+            azure_analyser(self.image_url)
 
 
 class TestDeepAIAnalyser(TestCase):
@@ -216,7 +213,7 @@ class TestDeepAIAnalyser(TestCase):
         assert DEEP_API_DENSE_CAP_RESPONSE == data['DenseCap']
 
     @responses.activate
-    def test_fails_silently_if_error(self):
+    def test_raise_exception_if_any_error(self):
         responses.add(
             responses.POST,
             self.url,
@@ -225,6 +222,5 @@ class TestDeepAIAnalyser(TestCase):
             headers=self.headers,
         )
 
-        data = deep_ai_analyser(self.image_url)
-
-        assert data is None
+        with pytest.raises(AnalysisError):
+            deep_ai_analyser(self.image_url)

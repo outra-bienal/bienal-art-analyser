@@ -34,6 +34,15 @@ docker-compose up -d
 Além disso, há também a dependência com o [YOLO](https://pjreddie.com/darknet/yolo/) para conseguir executar o algorimo de detecção das imagens.
 Siga [estes passos](https://pjreddie.com/darknet/install/) para instalar o Darknet e depois lembre-se de atualizar a variável de ambiente `DARKNET_DIR` dentro do seu `.env`.
 
+Configure o vhost do rabbitmq com seus valores:
+
+```bash
+$ docker exec bienalartanalyser_art_analyser_rabbitmq_1 rabbitmqctl add_vhost bienal
+$ docker exec bienalartanalyser_art_analyser_rabbitmq_1 rabbitmqctl add_user bienal bienal
+$ docker exec bienalartanalyser_art_analyser_rabbitmq_1 rabbitmqctl set_user_tags bienal bienal
+$ docker exec bienalartanalyser_art_analyser_rabbitmq_1 rabbitmqctl set_permissions -p bienal bienal ".*" ".*" ".*"
+```
+
 ## Criar schema e popular base de dados
 Com a infra de pé, execute o seguinte comando para criar e preparar o banco:
 
