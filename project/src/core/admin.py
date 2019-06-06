@@ -98,6 +98,7 @@ class AnalysedImageAdmin(admin.ModelAdmin):
     list_filter = [CollectionFilter]
     exclude = ['collection', 'image', 'recokgnition_result', 'recokgnition_job_id', 'ibm_watson_result', 'ibm_watson_job_id', 'deep_ai_result', 'deep_ai_job_id', 'google_vision_result', 'google_vision_job_id', 'azure_vision_result', 'azure_vision_job_id', 'yolo_image', 'yolo_job_id', 'detectron_image', 'clarifai_result', 'clarifai_job_id', 'dense_cap_job_id', 'dense_cap_image', 'dense_cap_full_image']
     readonly_fields = ['link_to_collection', 'preview', 'yolo', 'detectron', 'dense_cap', 'dense_cap_full', 'aws', 'ibm', 'google', 'azure', 'deep_ai', 'clarifai']
+    actions = ['run_analysis', 'generate_dense_cap_images']
 
     def has_add_permission(self, request):
         return False
@@ -178,6 +179,20 @@ class AnalysedImageAdmin(admin.ModelAdmin):
         if not request.user.is_superuser:
             return qs.filter(collection__public=True)
         return qs
+
+    def run_analysis(self, request, queryset):
+        for img in queryset.all():
+            img.enqueue_analysis()
+        msg = "{} imagens foram enfileiradas para serem analisadas.".format(queryset.count())
+        self.message_user(request, msg, messages.SUCCESS)
+    run_analysis.short_description = _('Roda AI nas imagens')
+
+    def generate_dense_cap_images(self, request, queryset):
+        for img in queryset.all():
+            img.enqueue_dense_cap_image()
+        msg = "Gerando imagens de DenseCap para {} imagens.".format(queryset.count())
+        self.message_user(request, msg, messages.SUCCESS)
+    generate_dense_cap_images.short_description = _('Gerar imagens do DenseCap')
 
 
 admin.site.register(Collection, CollectionAdmin)
